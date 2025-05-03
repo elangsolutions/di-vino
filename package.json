@@ -1,0 +1,13 @@
+{
+  "name": "di-vino",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {},
+  "devDependencies": {
+    "concurrently": "^8.0.1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
