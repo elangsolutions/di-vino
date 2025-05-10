@@ -6,6 +6,9 @@ type Product {
   _id: ID!
   name: String!
   price: Float!
+  category: String!
+  stock: Float!
+  image: String
 }
 
 type Query {
@@ -13,9 +16,16 @@ type Query {
 }
 
 type Mutation {
-  createProduct(name: String!, price: Float!): Product!
+  addProduct(input: AddProductInput!): Product!
   register(input: RegisterInput!): String!
   login(input: LoginInput!): String!
+}
+
+input AddProductInput {
+  name: String!
+  category: String!
+  price: Float!
+  image: String
 }
 
 input RegisterInput {

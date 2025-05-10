@@ -15,6 +15,18 @@ export class Product extends Document {
   @Field()
   @Prop()
   price: number;
+
+  @Field()
+  @Prop()
+  category: string;
+
+  @Field()
+  @Prop()
+  stock: number;
+
+  @Field({ nullable: true })
+  @Prop()
+  image?: string;
 }
 
 export const ProductSchema = SchemaFactory.createForClass(Product);
