@@ -15,7 +15,8 @@ import { AuthProvider } from "./context/AuthContext";
 import { PrivateRoute } from "./components/routes/PrivateRoute";
 import InstanceFormPage from "./pages/AdminPage/AddInstance";
 import ProductForm from "./pages/AdminPage/Products/ProductForm";
-
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 const { Title } = Typography;
 const { Header } = Layout;
 
@@ -29,6 +30,7 @@ const App: FC = () => {
     }, [isDarkMode]);
 
     return (
+        <Provider store={store}>
         <ConfigProvider
             theme={{
                 algorithm: isDarkMode
@@ -92,6 +94,7 @@ const App: FC = () => {
                 </Router>
             </AuthProvider>
         </ConfigProvider>
+        </Provider>
     );
 };
 
