@@ -12,6 +12,10 @@ export class Product extends Document {
   @Prop()
   name: string;
 
+  @Field({nullable:true})
+  @Prop()
+  details: string;
+
   @Field()
   @Prop()
   price: number;

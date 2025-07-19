@@ -5,6 +5,7 @@
 type Product {
   _id: ID!
   name: String!
+  details: String
   price: Float!
   category: String!
   stock: Float!
@@ -13,6 +14,7 @@ type Product {
 
 type Query {
   products: [Product!]!
+  product(id: String!): Product!
 }
 
 type Mutation {
@@ -22,7 +24,9 @@ type Mutation {
 }
 
 input AddProductInput {
+  _id: String
   name: String!
+  details: String!
   category: String!
   price: Float!
   image: String

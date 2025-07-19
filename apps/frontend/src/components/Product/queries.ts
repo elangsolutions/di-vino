@@ -5,6 +5,7 @@ export const GET_PRODUCTS = gql`
     products {
       _id
       name
+      details
       price
       category
       image
@@ -17,8 +18,22 @@ export const ADD_PRODUCT = gql`
     addProduct(input: $input) {
       _id
       name
+      details
       category
       price
+      image
+    }
+  }
+`;
+
+export const GET_PRODUCT = gql`
+  query GetProduct($id: String!) {
+    product(id: $id) {
+      _id
+      name
+      price
+      category
+      details
       image
     }
   }

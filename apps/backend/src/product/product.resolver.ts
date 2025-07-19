@@ -3,6 +3,7 @@ import { ProductService } from './product.service';
 import { Product } from './product.schema';
 import {AddProductInput} from "./dto/add-product.input";
 
+
 @Resolver(() => Product)
 export class ProductResolver {
   constructor(private productService: ProductService) {}
@@ -10,6 +11,11 @@ export class ProductResolver {
   @Query(() => [Product])
   products() {
     return this.productService.findAll();
+  }
+
+  @Query(() => Product)
+   product(@Args('id') id: string) {
+    return this.productService.findOne(id);
   }
 
   @Mutation(() => Product)

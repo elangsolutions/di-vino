@@ -9,7 +9,7 @@ interface InstanceFormPageProps {
 }
 
 const InstanceFormPage = ({ entityName, renderForm }: InstanceFormPageProps) => {
-    const { id } = useParams<{ id: string }>();
+    const { id } = useParams<{ id?: string }>();
     const isEdit = Boolean(id);
 
     return (
@@ -17,7 +17,7 @@ const InstanceFormPage = ({ entityName, renderForm }: InstanceFormPageProps) => 
             <Typography.Title level={3}>
                 {isEdit ? `Editar ${capitalize(entityName)} #${id}` : `Agregar ${capitalize(entityName)}`}
             </Typography.Title>
-            {renderForm(id)}
+            {renderForm && (isEdit && !id ? null : renderForm(id))}
         </div>
     );
 };

@@ -35,7 +35,15 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
               hoverable
               cover={<img alt={product.name} src={product.image||NO_IMAGE}/>}
         >
-            <Card.Meta title={product.name} description={product.price}/>
+            <Card.Meta
+                title={product.name}
+                description={
+                    <>
+                        <div style={{ fontWeight: 'bold' }}>${product.price}.-</div>
+                        <div style={{ color: 'gray' }}>{product.details}</div> {/* Extra line */}
+                    </>
+                }
+            />
             <Space style={{ marginTop: 12 }}>
                 <Button
                     icon={<MinusOutlined />}

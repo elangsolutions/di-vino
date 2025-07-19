@@ -1,41 +1,66 @@
 import { Button, Form, Input, InputNumber, Select } from "antd";
 import { useForm, Controller } from "react-hook-form";
-import { useMutation } from "@apollo/client";
-import { ADD_PRODUCT } from "../../../../components/Product/queries.ts";
+import { useMutation, useQuery } from "@apollo/client";
+import { ADD_PRODUCT, GET_PRODUCT } from "../../../../components/Product/queries.ts";
+import { useEffect, useState } from "react";
+import {useNotify} from "../../../../context/NotificationContext";
 
 interface ProductFormData {
     name: string;
+    details: string;
     category: string;
     price: number;
     image?: string;
 }
 
 const ProductForm = ({ productId }: { productId?: string }) => {
-    const { control, handleSubmit } = useForm<ProductFormData>();
+    const { control, handleSubmit, reset } = useForm<ProductFormData>();
     const [addProduct, { loading }] = useMutation(ADD_PRODUCT);
+    const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
+    const { notifySuccess, notifyError } = useNotify();
+    const { data, loading : fetching } = useQuery(GET_PRODUCT, {
+        variables: { id: productId },
+        skip: !productId,
+    });
 
-    const onSubmit = async (data: ProductFormData) => {
+    useEffect(() => {
+        if (data?.product) {
+            reset({
+                name: data.product.name,
+                price: data.product.price,
+                details: data.product.details,
+                category: data.product.category,
+                image: data.product.image,
+            });
+            setImagePreview(data.product.image);
+        }
+    }, [data, reset]);
+
+    const onSubmit = async (formData: ProductFormData) => {
         try {
             await addProduct({
                 variables: {
                     input: {
-                        name: data.name,
-                        category: data.category,
-                        price: data.price,
-                        image: data.image || null,
+                        _id: productId === 'new' ? undefined: productId,
+                        name: formData.name,
+                        details: formData.details,
+                        category: formData.category,
+                        price: formData.price,
+                        image: formData.image || null,
                     },
                 },
             });
-            // Redirect or show success message here
-            alert("Producto agregado exitosamente");
+
+            notifySuccess("Éxito", "Producto creado con éxito");
+
         } catch (error) {
-            console.error("Error al agregar producto:", error);
+            notifyError("Error al agregar producto", error.name);
         }
     };
 
     return (
-        <Form layout="vertical" onFinish={handleSubmit(onSubmit)}>
-            <Form.Item label="Nombre de producto">
+        <Form layout="vertical" onFinish={handleSubmit(onSubmit)} style={{ maxWidth: 500 }}>
+            <Form.Item label="Nombre de producto" required>
                 <Controller
                     name="name"
                     control={control}
@@ -44,13 +69,21 @@ const ProductForm = ({ productId }: { productId?: string }) => {
                 />
             </Form.Item>
 
-            <Form.Item label="Categoría">
+            <Form.Item label="Detalles del producto" required>
+                <Controller
+                    name="details"
+                    control={control}
+                    render={({ field }) => <Input.TextArea {...field} autoSize />}
+                />
+            </Form.Item>
+
+            <Form.Item label="Categoría" required>
                 <Controller
                     name="category"
                     control={control}
                     rules={{ required: "Requerido" }}
                     render={({ field }) => (
-                        <Select {...field} placeholder="Selecciona una categoría">
+                        <Select {...field} placeholder="Selecciona una categoría" allowClear>
                             <Select.Option value="vino">Vino</Select.Option>
                             <Select.Option value="cerveza">Cerveza</Select.Option>
                             <Select.Option value="licor">Licor</Select.Option>
@@ -59,26 +92,54 @@ const ProductForm = ({ productId }: { productId?: string }) => {
                 />
             </Form.Item>
 
-            <Form.Item label="Precio">
+            <Form.Item label="Precio" required>
                 <Controller
                     name="price"
                     control={control}
-                    rules={{ required: "Requerido" }}
-                    render={({ field }) => <InputNumber {...field} style={{ width: "100%" }} />}
+                    rules={{ required: "Requerido", min: 0 }}
+                    render={({ field }) => (
+                        <InputNumber
+                            {...field}
+                            min={0}
+                            style={{ width: "100%" }}
+                            formatter={(value) => `$ ${value}`}
+                            parser={(value) => parseFloat(value?.replace(/\$\s?|(,*)/g, "") || "0")}
+                        />
+                    )}
                 />
             </Form.Item>
 
-            <Form.Item label="Imagen (opcional)">
+            <Form.Item label="Imagen (URL opcional)">
                 <Controller
                     name="image"
                     control={control}
-                    render={({ field }) => <Input {...field} />}
+                    render={({ field: { onChange, ...rest } }) => (
+                        <>
+                            <Input
+                                {...rest}
+                                onChange={(e) => {
+                                    const url = e.target.value;
+                                    setImagePreview(url);
+                                    onChange(url);
+                                }}
+                            />
+                            {imagePreview && (
+                                <img
+                                    src={imagePreview}
+                                    alt="Vista previa"
+                                    style={{ width: "100%", marginTop: 10, borderRadius: 4 }}
+                                />
+                            )}
+                        </>
+                    )}
                 />
             </Form.Item>
 
-            <Button type="primary" htmlType="submit" loading={loading}>
-                {productId ? "Actualizar" : "Agregar"}
-            </Button>
+            <Form.Item>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                    {productId ? "Actualizar producto" : "Agregar producto"}
+                </Button>
+            </Form.Item>
         </Form>
     );
 };
