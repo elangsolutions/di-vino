@@ -1,0 +1,86 @@
+import React, {useState} from 'react';
+import {Button, message, Steps, theme} from 'antd';
+import CartList from "./CartList";
+import {useDispatch} from "react-redux";
+import {decrement, increment, remove} from "../../store/cart/slice.ts";
+
+
+const App: React.FC = () => {
+    const { token } = theme.useToken();
+    const [current, setCurrent] = useState(0);
+    const dispatch = useDispatch()
+
+    const handleIncrement = (productId:string) => {
+        dispatch(increment({ productId: productId }));
+    }
+
+    const handleDecrease = (productId:string) => {
+        dispatch(decrement({ productId: productId }));
+    }
+    const handleRemove = (productId:string) => {
+        dispatch(remove({ productId: productId }));
+    }
+
+
+    const steps = [
+        {
+            title: 'Lista de pedidos',
+            content: <CartList onIncrease={handleIncrement} onDecrease={handleDecrease} onRemove =  {handleRemove} />,
+        },
+        {
+            title: 'Direccion de Entrega/PickUp',
+            content: 'Second-content',
+        },
+        {
+            title: 'Forma de Pago',
+            content: 'Last-content',
+        },
+    ];
+
+
+    const next = () => {
+        setCurrent(current + 1);
+    };
+
+    const prev = () => {
+        setCurrent(current - 1);
+    };
+
+    const items = steps.map((item) => ({ key: item.title, title: item.title }));
+
+    const contentStyle: React.CSSProperties = {
+        lineHeight: '260px',
+        textAlign: 'center',
+        color: token.colorTextTertiary,
+        backgroundColor: token.colorFillAlter,
+        borderRadius: token.borderRadiusLG,
+        border: `1px dashed ${token.colorBorder}`,
+        marginTop: 16,
+    };
+
+    return (
+        <>
+            <Steps current={current} items={items} />
+            <div style={contentStyle}>{steps[current].content}</div>
+            <div style={{ marginTop: 24 }}>
+                {current > 0 && (
+                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                        Atras
+                    </Button>
+                )}
+                {current < steps.length - 1 && (
+                    <Button type="primary" onClick={() => next()}>
+                        Siguiente
+                    </Button>
+                )}
+                {current === steps.length - 1 && (
+                    <Button type="primary" onClick={() => message.success('Processing complete!')}>
+                        Comprar
+                    </Button>
+                )}
+            </div>
+        </>
+    );
+};
+
+export default App;

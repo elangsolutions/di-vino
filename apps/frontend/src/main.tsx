@@ -8,7 +8,7 @@ import { ConfigProvider, theme as antdTheme, App as AntdApp } from 'antd';
 import { NotificationProvider } from './context/NotificationContext';
 
 const Root = () => {
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isDarkMode, setIsDarkMode] = useState(true);
 
     useEffect(() => {
         const storedTheme = localStorage.getItem('theme');

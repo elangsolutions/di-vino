@@ -2,16 +2,9 @@ import './App.css';
 import LandingPage from "./pages/LandingPage";
 import AdminPage from "./pages/AdminPage";
 import LoginPage from "./pages/LoginPage";
-import {
-    ConfigProvider,
-    App as AntdApp,
-    Layout,
-    Row,
-    theme as antdTheme,
-    Typography,
-} from "antd";
-import {FC, useEffect, useState} from "react";
-import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
+import {Layout, Row, Typography,} from "antd";
+import {FC} from "react";
+import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import {AuthProvider} from "./context/AuthContext";
 import {PrivateRoute} from "./components/routes/PrivateRoute";
 import InstanceFormPage from "./pages/AdminPage/AddInstance";
@@ -19,7 +12,7 @@ import ProductForm from "./pages/AdminPage/Products/ProductForm";
 import {Provider} from 'react-redux';
 import {store} from './store/store';
 import ProductListPage from "./pages/AdminPage/Products/ProductList";
-import {NotificationProvider} from "./context/NotificationContext";
+import CartPage from "./pages/CartPage";
 
 const {Title} = Typography;
 const {Header} = Layout;
@@ -80,6 +73,7 @@ const App: FC = () => {
                                     }
                                 />
                             </Route>
+                            <Route path='cart' element={<CartPage />}/>
                         </Routes>
                     </Layout>
                 </Router>

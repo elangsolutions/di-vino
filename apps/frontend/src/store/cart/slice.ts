@@ -8,7 +8,7 @@ const initialState: CartState = {
     quantities: {},
 };
 
-const cartSlice = createSlice({
+const slice = createSlice({
     name: 'cart',
     initialState,
     reducers: {
@@ -22,8 +22,12 @@ const cartSlice = createSlice({
             const current = state.quantities[id] || 0;
             state.quantities[id] = current > 0 ? current - 1 : 0;
         },
+        remove: (state, action: PayloadAction<{ productId: string }>) => {
+            const id = action.payload.productId;
+            delete state.quantities[id]
+        },
     },
 });
 
-export const { increment, decrement } = cartSlice.actions;
-export default cartSlice.reducer;
+export const { increment, decrement, remove } = slice.actions;
+export default slice.reducer;

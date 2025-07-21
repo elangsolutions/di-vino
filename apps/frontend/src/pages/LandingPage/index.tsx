@@ -1,4 +1,4 @@
-import {FC} from 'react';
+import {FC, useEffect} from 'react';
 import {Alert, Badge, Col, Layout, Row, Spin, Typography} from 'antd';
 import './index.css';
 import ProductCard from "./Products/ProductCard";
@@ -6,8 +6,9 @@ import {useGetProducts} from "../../components/Product/hooks/useGetProducts.ts";
 import {Product} from "../../generated/graphql.ts";
 import {ShoppingFilled, ShoppingOutlined} from '@ant-design/icons';
 import {useNavigate} from 'react-router-dom';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import type {RootState} from '../../store/store';
+import {cacheProducts} from "../../store/product/slice.ts";
 
 const {Title, Paragraph} = Typography;
 const {Content, Footer} = Layout;
@@ -17,10 +18,17 @@ const quantitySum = (quantities: Record<string, number>) =>
 
 const LandingPage: FC = () => {
     const {products, loading, error} = useGetProducts();
+    const dispatch =useDispatch();
     const navigate = useNavigate();
     const cartQuantities = useSelector((state: RootState) => state.cart.quantities);
     const totalItems = quantitySum(cartQuantities);
 
+
+    useEffect(() => {
+        if (products) {
+            dispatch(cacheProducts(products));
+        }
+    }, [products, dispatch]);
     const handleCartClick = () => {
         navigate('/cart');
     };

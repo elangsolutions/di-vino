@@ -7,7 +7,7 @@ import {Product} from "../../../../generated/graphql.ts";
 import NO_IMAGE from "../../../../assets/place_holder.png";
 import {RootState} from "@reduxjs/toolkit/query";
 import {useDispatch, useSelector} from "react-redux";
-import {decrement, increment} from "../../../../store/cart/cartSlice.ts";
+import {decrement, increment} from "../../../../store/cart/slice.ts";
 
 type ProductCardProps = {
     product: Product
@@ -16,7 +16,6 @@ type ProductCardProps = {
 const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCardProps) => {
 
     const {product} = props;
-    debugger;
     const {isOpen, close, open} = useDisclosure()
     const dispatch = useDispatch();
     const quantity = useSelector((state: RootState) => state.cart.quantities[product._id] || 0);
