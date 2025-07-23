@@ -4,6 +4,7 @@ import { Card, List, Typography, Button, Spin } from "antd";
 import { Link } from "react-router-dom";
 import { GET_PRODUCTS } from "../../../../components/Product/queries";
 import { Product } from "../types";
+import {priceFormat} from "../../../../utils";
 
 const ProductListPage = () => {
     const { data, loading, error } = useQuery(GET_PRODUCTS);
@@ -27,7 +28,7 @@ const ProductListPage = () => {
                             extra={<Link to={`/admin/products/${product._id}`}>Editar</Link>}
                         >
                             <div>
-                            <p>Precio: ${product.price}</p>
+                            <p>Precio: ${priceFormat(product.price)}</p>
                             <p>{product.details}</p>
                             </div>
                         </Card>

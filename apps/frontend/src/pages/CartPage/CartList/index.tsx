@@ -2,6 +2,7 @@ import React, {useMemo} from 'react';
 import {Card, Row, Col, Button, Typography, Divider} from 'antd';
 import {MinusOutlined, PlusOutlined, DeleteOutlined} from '@ant-design/icons';
 import {useSelector} from "react-redux";
+import {priceFormat} from "../../../utils";
 
 // Dummy product cart type
 type Product = {
@@ -64,7 +65,7 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
                     </Col>
                     <Col span={4} style={{textAlign: 'end'}}>
                         <Typography.Text strong>
-                            ${(product.price * product.quantity).toFixed(2)}
+                            ${priceFormat(product.price * product.quantity)}
                         </Typography.Text>
                     </Col>
                 </Row>
@@ -72,7 +73,7 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
             <Divider/>
             <Row justify="end">
                 <Col>
-                    <Typography.Title level={5}>Total: ${total.toFixed(2)}</Typography.Title>
+                    <Typography.Title level={5}>Total: ${priceFormat(total)}</Typography.Title>
                 </Col>
             </Row>
         </Card>

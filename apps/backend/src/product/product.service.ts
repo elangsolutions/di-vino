@@ -10,8 +10,6 @@ export class ProductService {
   constructor(@InjectModel(Product.name) private model: Model<Product>) {}
 
   async create(input: AddProductInput) {
-    console.log(`Hello ${input._id}`);
-
 
     return this.model.findOneAndUpdate(
         { _id: new Types.ObjectId(input._id) },

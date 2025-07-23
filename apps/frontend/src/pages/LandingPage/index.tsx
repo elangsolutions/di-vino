@@ -45,8 +45,7 @@ const LandingPage: FC = () => {
                         <Col>
                             <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12}}>
                                 <Col>
-                                    <Title level={3}>Nuestros productos</Title>
-                                    <Paragraph>Descubrí una nueva forma de comprar</Paragraph>
+                                    <Title level={3}>Descubrí una nueva forma de comprar</Title>
                                 </Col>
                                 <Col>
                                     <Badge count={totalItems} size="small" offset={[2, -2]}>
@@ -67,9 +66,7 @@ const LandingPage: FC = () => {
                         </Col>
                     </Row>
                 </section>
-
                 <section>
-                    <Title level={4}>Lo que más Sale!</Title>
                     <Row gutter={[16, 16]} style={{margin: '16px 0'}}>
                         {products.map((product: Product) => (
                             <ProductCard key={product._id} product={product}/>

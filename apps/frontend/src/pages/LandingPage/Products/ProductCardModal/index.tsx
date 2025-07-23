@@ -1,5 +1,6 @@
-import {Card, Modal} from "antd";
+import { Modal } from "antd";
 import {Product} from "../../../generated/graphql.ts";
+import NO_IMAGE from "../../../../assets/place_holder.png";
 
 type ProductCardModalProps = {
     isOpen: boolean;
@@ -8,11 +9,11 @@ type ProductCardModalProps = {
 }
 const ProductCardModal = (props:ProductCardModalProps)=> {
     const {isOpen, close, product} = props;
-    return  <Modal open={isOpen} onCancel={close} onOk={close} closeIcon={false}>
-            <Card style={{ width: '100%' }}
-                cover={<img alt={product.name} src={product.image} />}
-            >
-            </Card>
+    return  <Modal open={isOpen} closeIcon={true} onCancel={close} footer={null}>
+        <div>
+        <img style={{width:'400px'}} alt={product.name} src={product.image || NO_IMAGE}/>
+
+        </div>
     </Modal>
 }
 

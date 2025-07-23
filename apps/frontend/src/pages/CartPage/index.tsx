@@ -3,10 +3,14 @@ import {Button, message, Steps, theme} from 'antd';
 import CartList from "./CartList";
 import {useDispatch} from "react-redux";
 import {decrement, increment, remove} from "../../store/cart/slice.ts";
+import CartDelivery from "./CartDelivery";
+import {useNavigate} from "react-router-dom";
+import CartPayment from "./CartPayment";
 
 
 const App: React.FC = () => {
     const { token } = theme.useToken();
+    const navigate = useNavigate();
     const [current, setCurrent] = useState(0);
     const dispatch = useDispatch()
 
@@ -29,11 +33,11 @@ const App: React.FC = () => {
         },
         {
             title: 'Direccion de Entrega/PickUp',
-            content: 'Second-content',
+            content: <CartDelivery />,
         },
         {
             title: 'Forma de Pago',
-            content: 'Last-content',
+            content: <CartPayment total={45000}/>,
         },
     ];
 
@@ -43,6 +47,9 @@ const App: React.FC = () => {
     };
 
     const prev = () => {
+        if(current ===0){
+            navigate("/")
+        }
         setCurrent(current - 1);
     };
 
@@ -66,6 +73,11 @@ const App: React.FC = () => {
                 {current > 0 && (
                     <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
                         Atras
+                    </Button>
+                )}
+                {current === 0 && (
+                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
+                        Volver
                     </Button>
                 )}
                 {current < steps.length - 1 && (

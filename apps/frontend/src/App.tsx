@@ -33,7 +33,7 @@ const App: FC = () => {
                             }}
                         >
                             <Row align={"middle"}>
-                                <Title level={3}>Di Vino</Title>
+                                <Title level={1}>Di Vino!</Title>
                             </Row>
                         </Header>
                         <Routes>
