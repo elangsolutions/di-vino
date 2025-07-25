@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import {RootState} from "@reduxjs/toolkit/query";
 
 interface CartState {
     quantities: Record<string, number>; // key = product.id
@@ -13,7 +14,6 @@ const slice = createSlice({
     initialState,
     reducers: {
         increment: (state, action: PayloadAction<{ productId: string }>) => {
-            debugger
             const id = action.payload.productId;
             state.quantities[id] = (state.quantities[id] || 0) + 1;
         },
@@ -31,3 +31,4 @@ const slice = createSlice({
 
 export const { increment, decrement, remove } = slice.actions;
 export default slice.reducer;
+export const getCartItemsCount = (state: RootState) => Object.keys(state.cart.quantities)?.length||0;

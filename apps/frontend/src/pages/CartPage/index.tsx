@@ -1,8 +1,8 @@
 import React, {useState} from 'react';
 import {Button, message, Steps, theme} from 'antd';
 import CartList from "./CartList";
-import {useDispatch} from "react-redux";
-import {decrement, increment, remove} from "../../store/cart/slice.ts";
+import {useDispatch, useSelector} from "react-redux";
+import {decrement, getCartItemsCount, increment, remove} from "../../store/cart/slice.ts";
 import CartDelivery from "./CartDelivery";
 import {useNavigate} from "react-router-dom";
 import CartPayment from "./CartPayment";
@@ -13,6 +13,7 @@ const App: React.FC = () => {
     const navigate = useNavigate();
     const [current, setCurrent] = useState(0);
     const dispatch = useDispatch()
+    const cartItemsCount  = useSelector(getCartItemsCount);
 
     const handleIncrement = (productId:string) => {
         dispatch(increment({ productId: productId }));
@@ -37,7 +38,7 @@ const App: React.FC = () => {
         },
         {
             title: 'Forma de Pago',
-            content: <CartPayment total={45000}/>,
+            content: <CartPayment amount={45000}/>,
         },
     ];
 
@@ -80,7 +81,7 @@ const App: React.FC = () => {
                         Volver
                     </Button>
                 )}
-                {current < steps.length - 1 && (
+                {current < steps.length - 1 && cartItemsCount > 0 && (
                     <Button type="primary" onClick={() => next()}>
                         Siguiente
                     </Button>

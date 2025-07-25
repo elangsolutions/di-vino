@@ -57,7 +57,6 @@ const LandingPage: FC = () => {
                                         ) : (
                                             <ShoppingOutlined
                                                 style={{fontSize: 28, cursor: 'pointer'}}
-                                                onClick={handleCartClick}
                                             />
                                         )}
                                     </Badge>

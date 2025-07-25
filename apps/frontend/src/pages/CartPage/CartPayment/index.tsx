@@ -6,17 +6,25 @@ initMercadoPago('TEST-e7ecd3a3-887f-40dc-9daa-11f2d837947a', {locale: "es-AR"});
 
 const CartPayment = ({amount}: any) => {
 
+    debugger
     const initialization = {
-        amount: 100,
-        preferenceId: "<PREFERENCE_ID>",
+        amount: amount,
     };
+
     const customization = {
-        paymentMethods: {
-            ticket: "all",
-            creditCard: "all",
-            prepaidCard: "all",
-            debitCard: "all",
-            mercadoPago: "all",
+        visual: {
+            style: {
+                theme: 'default', // or 'dark'
+                variables: {
+                    '--base-color': '#1E88E5',
+                    '--form-background-color': '#f0f0f0',
+                    '--input-background-color': '#ffffff',
+                    '--text-primary-color': '#111111',
+                    '--border-radius-medium': '12px',
+                    '--max-height':  '500px',
+                },
+            },
+
         },
     };
 
@@ -54,7 +62,17 @@ const CartPayment = ({amount}: any) => {
         console.log(error);
     };
 
-    return <div style={{width: "550px"}}>
+    return <div
+        style={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+            padding: '2rem',
+            maxWidth: '500px',
+            maxHeight: '700px',
+            margin: '0 auto',
+        }}
+    >
         <MPCardPayment
             initialization={initialization}
             customization={customization}
