@@ -1,12 +1,8 @@
 import {CardPayment as MPCardPayment, initMercadoPago} from '@mercadopago/sdk-react';
-
-
 initMercadoPago('TEST-e7ecd3a3-887f-40dc-9daa-11f2d837947a', {locale: "es-AR"});
-
 
 const CartPayment = ({amount}: any) => {
 
-    debugger
     const initialization = {
         amount: amount,
     };
@@ -14,14 +10,14 @@ const CartPayment = ({amount}: any) => {
     const customization = {
         visual: {
             style: {
-                theme: 'default', // or 'dark'
+                theme: 'dark',
                 variables: {
                     '--base-color': '#1E88E5',
                     '--form-background-color': '#f0f0f0',
                     '--input-background-color': '#ffffff',
                     '--text-primary-color': '#111111',
                     '--border-radius-medium': '12px',
-                    '--max-height':  '500px',
+                    '--height':  '500px',
                 },
             },
 
@@ -69,7 +65,7 @@ const CartPayment = ({amount}: any) => {
             alignItems: 'flex-start',
             padding: '2rem',
             maxWidth: '500px',
-            maxHeight: '700px',
+            height: '500px',
             margin: '0 auto',
         }}
     >
