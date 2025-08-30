@@ -1,15 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { ObjectType, Field, ID, InputType, registerEnumType } from '@nestjs/graphql';
 import { Document } from 'mongoose';
-import {Delivery} from "./delivery/delivery.schema";
+import {Delivery, DeliveryType} from "./delivery/delivery.schema";
 import {AddAddressInput} from "../user/address/dto/add-address.input";
 
-export enum DeliveryType {
-    PICKUP = 'pickup',
-    ADDRESS = 'address',
-}
-
-registerEnumType(DeliveryType, { name: 'DeliveryType' });
 
 @ObjectType()
 export class OrderItem {

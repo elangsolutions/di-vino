@@ -1,4 +1,4 @@
-import {Field, ObjectType} from "@nestjs/graphql";
+import {Field, ObjectType, registerEnumType} from "@nestjs/graphql";
 import {Prop} from "@nestjs/mongoose";
 import {Address} from "../../user/address/address.schema";
 
@@ -7,6 +7,8 @@ export enum DeliveryType {
     PICKUP = 'pickup',
     ADDRESS = 'address',
 }
+
+registerEnumType(DeliveryType, { name: 'DeliveryType' });
 
 @ObjectType()
 export class Delivery {

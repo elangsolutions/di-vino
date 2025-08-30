@@ -9,6 +9,10 @@ import {createOrderNumber} from "./utils";
 export class OrderService {
     constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
 
+    async findAll() {
+        return this.orderModel.find();
+    }
+
     async createDraft(input: CreateOrderDraftInput): Promise<Order> {
         const external_reference = createOrderNumber();
         const created = new this.orderModel({...input, status: 'pending_payment' , external_reference });
