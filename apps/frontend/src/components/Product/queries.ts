@@ -38,3 +38,12 @@ export const GET_PRODUCT = gql`
     }
   }
 `;
+
+export const DELETE_PRODUCT = gql`
+  mutation DeleteProduct($input: RemoveProductInput!) {
+    deleteProduct(input: $input) {
+      _id
+      name
+    }
+  }
+`;

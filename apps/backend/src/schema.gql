@@ -65,8 +65,9 @@ type Query {
 type Mutation {
   register(input: RegisterInput!): String!
   login(input: LoginInput!): String!
-  createOrderDraft(input: CreateOrderDraftInput!): Order!
+  createOrder(input: CreateOrderDraftInput!): Order!
   addProduct(input: AddProductInput!): Product!
+  deleteProduct(input: RemoveProductInput!): Product!
 }
 
 input RegisterInput {
@@ -80,9 +81,18 @@ input LoginInput {
 }
 
 input CreateOrderDraftInput {
+  state: OrderState!
   items: [OrderItemInput!]!
   delivery: DeliveryInput!
   userId: String!
+}
+
+enum OrderState {
+  DRAFT
+  OPEN
+  PAID
+  DELIVERED
+  CLOSED
 }
 
 input OrderItemInput {
@@ -112,4 +122,8 @@ input AddProductInput {
   category: String!
   price: Float!
   image: String
+}
+
+input RemoveProductInput {
+  _id: String
 }

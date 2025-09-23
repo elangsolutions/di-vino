@@ -1,0 +1,6 @@
+/* Apply font to all elements, including antd components */
+*,
+*::before,
+*::after {
+    font-family: 'EB Garamond', serif !important;
+}

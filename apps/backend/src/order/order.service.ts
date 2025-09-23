@@ -6,16 +6,22 @@ import {CreateOrderDraftInput} from "./dto/create-order.input";
 import {createOrderNumber} from "./utils";
 
 @Injectable()
-export class OrderService {
+export default class OrderService {
     constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
 
     async findAll() {
         return this.orderModel.find();
     }
 
-    async createDraft(input: CreateOrderDraftInput): Promise<Order> {
+    async create(input: CreateOrderDraftInput): Promise<Order> {
         const external_reference = createOrderNumber();
         const created = new this.orderModel({...input, status: 'pending_payment' , external_reference });
         return created.save();
+    }
+
+    async countOrdersWithProduct(_id: string):Promise<number> {
+        return this.orderModel.countDocuments({
+            "items.productId": _id
+        });
     }
 }
