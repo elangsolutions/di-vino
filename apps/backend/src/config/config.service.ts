@@ -12,4 +12,8 @@ export class ConfigService {
   get port(): number | undefined{
     return this.nestConfig.get<number>('port');
   }
+
+  get mpAccessToken():string | undefined{
+    return this.nestConfig.get<string>('MP_ACCESS_TOKEN') || '1234qwerty';
+  }
 }

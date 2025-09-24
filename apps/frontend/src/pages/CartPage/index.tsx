@@ -1,5 +1,5 @@
-import React, {useState} from 'react';
-import {Button, message, Steps, theme} from 'antd';
+import {FC, useState} from 'react';
+import {Button, message, Steps} from 'antd';
 import CartList from "./CartList";
 import {useDispatch, useSelector} from "react-redux";
 import {decrement, getCartItemsCount, increment, remove} from "../../store/cart/slice.ts";
@@ -7,9 +7,7 @@ import CartDelivery from "./CartDelivery";
 import {useNavigate} from "react-router-dom";
 import CartPayment from "./CartPayment";
 
-
-const App: React.FC = () => {
-    const { token } = theme.useToken();
+const CartPage = () => {
     const navigate = useNavigate();
     const [current, setCurrent] = useState(0);
     const dispatch = useDispatch()
@@ -37,9 +35,13 @@ const App: React.FC = () => {
             content: <CartDelivery />,
         },
         {
-            title: 'Forma de Pago',
-            content: <CartPayment amount={45000}/>,
+            title: 'Resumen-confirmacion',
+            content: <CartPayment />,
         },
+        {
+            title: 'En Proceso',
+                content: 'Su pedido está en Camino'
+        }
     ];
 
 
@@ -56,20 +58,10 @@ const App: React.FC = () => {
 
     const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
-    const contentStyle: React.CSSProperties = {
-        lineHeight: '260px',
-        textAlign: 'center',
-        color: token.colorTextTertiary,
-        backgroundColor: token.colorFillAlter,
-        borderRadius: token.borderRadiusLG,
-        border: `1px dashed ${token.colorBorder}`,
-        marginTop: 16,
-    };
-
     return (
         <>
             <Steps current={current} items={items} />
-            <div style={contentStyle}>{steps[current].content}</div>
+            <div>{steps[current].content}</div>
             <div style={{ marginTop: 24 }}>
                 {current > 0 && (
                     <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
@@ -96,4 +88,4 @@ const App: React.FC = () => {
     );
 };
 
-export default App;
+export default CartPage;

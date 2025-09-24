@@ -3,7 +3,6 @@ import LandingPage from "./pages/LandingPage";
 import AdminPage from "./pages/AdminPage";
 import LoginPage from "./pages/LoginPage";
 import {Layout, Row, Typography,} from "antd";
-import {FC} from "react";
 import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import {AuthProvider} from "./context/AuthContext";
 import {PrivateRoute} from "./components/routes/PrivateRoute";
@@ -17,7 +16,7 @@ import CartPage from "./pages/CartPage";
 const {Title} = Typography;
 const {Header} = Layout;
 
-const App: FC = () => {
+const App = () => {
 
     return (
         <Provider store={store}>

@@ -1,82 +1,50 @@
-//import {CardPayment as MPCardPayment, initMercadoPago} from '@mercadopago/sdk-react';
-//initMercadoPago('TEST-e7ecd3a3-887f-40dc-9daa-11f2d837947a', {locale: "es-AR"});
+import { QRCodeCanvas } from "qrcode.react";
+import {Card, Space, Typography} from "antd";
+const { Title, Text, Link } = Typography;
 
-const CartPayment = ({amount}: any) => {
+type PaymentQRProps = {
+    paymentLink: string;
+    amount: number;
+};
 
-    const initialization = {
-        amount: amount,
-    };
+const CartPayment =({ paymentLink, amount }: PaymentQRProps)=> {
+    return (
+        <Card
+            bordered
+            style={{
+                maxWidth: 400,
+                margin: "0 auto",
+                textAlign: "center",
+                borderRadius: "12px",
+                boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+            }}
+        >
+            <Space direction="vertical" size="large" style={{ width: "100%" }}>
+                <Title level={4} style={{ marginBottom: 0 }}>
+                    Escaneá el QR para pagar
+                </Title>
 
-    const customization = {
-        visual: {
-            style: {
-                theme: 'dark',
-                variables: {
-                    '--base-color': '#1E88E5',
-                    '--form-background-color': '#f0f0f0',
-                    '--input-background-color': '#ffffff',
-                    '--text-primary-color': '#111111',
-                    '--border-radius-medium': '12px',
-                    '--height':  '500px',
-                },
-            },
-
-        },
-    };
-
-    const onSubmit = async (
-        {selectedPaymentMethod, formData}
-    ) => {
-        // callback called when clicking the submit data button
-        return new Promise((resolve, reject) => {
-            fetch("/process_payment", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            })
-                .then((response) => response.json())
-                .then((response) => {
-                    // receive payment result
-                    resolve();
-                })
-                .catch((error) => {
-                    // handle error response when trying to create payment
-                    reject();
-                });
-        });
-    };
-    const onReady = async () => {
-        /*
-          Callback called when Brick is ready.
-          Here you can hide loadings from your site, for example.
-        */
-    };
-    const onError = async (error) => {
-        // callback llamado para todos los casos de error de Brick
-        console.log(error);
-    };
-
-    return <div
-        style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'flex-start',
-            padding: '2rem',
-            maxWidth: '500px',
-            height: '500px',
-            margin: '0 auto',
-        }}
-    >
-        {/*<MPCardPayment*/}
-        {/*    initialization={initialization}*/}
-        {/*    customization={customization}*/}
-        {/*    onSubmit={onSubmit}*/}
-        {/*    onReady={onReady}*/}
-        {/*    onError={onError}*/}
-        {/*/>*/}
-    </div>
+                <QRCodeCanvas
+                    value={paymentLink}
+                    size={220}
+                    bgColor="#ffffff"
+                    fgColor="#000000"
+                    level="H"
+                    includeMargin
+                />
+                <Text>
+                    O hacé click{" "}
+                    <Link href={paymentLink} target="_blank" rel="noopener noreferrer">
+                        aquí
+                    </Link>{" "}
+                    para pagar <b>${amount}</b>.
+                </Text>
+                <Text>
+                    Una vez confirmada tu compra tu Orden se prepara para el despacho en la fecha solicitada
+                </Text>
+            </Space>
+        </Card>
+    );
 }
 
 export default CartPayment;
