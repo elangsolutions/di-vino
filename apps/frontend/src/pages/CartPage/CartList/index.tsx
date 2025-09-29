@@ -51,6 +51,7 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
                         />
                         <span style={{margin: '0 8px'}}>{product.quantity}</span>
                         <Button
+                            type="primary"
                             icon={<PlusOutlined/>}
                             onClick={() => onIncrease(product.id)}
                             size="small"

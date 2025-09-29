@@ -10,16 +10,7 @@ import { ConfigProvider, theme as antdTheme, App as AntdApp } from 'antd';
 import { NotificationProvider } from './context/NotificationContext';
 
 const Root = () => {
-    const [isDarkMode, setIsDarkMode] = useState(true);
-
-    useEffect(() => {
-        const storedTheme = localStorage.getItem('theme');
-        if (storedTheme === 'dark') {
-            setIsDarkMode(true);
-        } else {
-            setIsDarkMode(false);
-        }
-    }, []);
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
     return (
         <ConfigProvider
@@ -27,6 +18,9 @@ const Root = () => {
                 algorithm: isDarkMode
                     ? antdTheme.darkAlgorithm
                     : antdTheme.defaultAlgorithm,
+                token: {
+                    colorPrimary: '#5ea18b', // custom green in dark mode
+                },
             }}
         >
             <AntdApp>

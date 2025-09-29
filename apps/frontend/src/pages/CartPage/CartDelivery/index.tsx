@@ -18,7 +18,7 @@ const { Title, Text } = Typography;
 const { Option } = Select;
 
 const pickupLocations = [
-    { id: 'loc1', name: 'San Sebastian - Guardia', timeSlots: ['10:00',  '16:00'] },
+    { id: 'loc1', name: 'San Sebastian - Guardia', timeSlots: ['10:00', '16:00'] },
     { id: 'loc2', name: 'El Canton - Guardia', timeSlots: ['10:00',  '16:00'] },
 ];
 
@@ -28,7 +28,19 @@ const CartDelivery: React.FC = () => {
 
     // Disable all dates before today
     const disablePastDates = (current: Dayjs) => {
-        return current && current < dayjs().startOf('day');
+        if (!current) return false;
+
+        const today = dayjs().startOf("day");
+        const nextWeekStart = today.add(1, "week").startOf("week"); // Monday next week
+
+        // Disable past dates and this week
+        if (current.isBefore(nextWeekStart, "day")) {
+            return true;
+        }
+
+        // Allow only Friday (5) and Saturday (6)
+        const day = current.day(); // Sunday=0 ... Saturday=6
+        return !(day === 5 || day === 6);
     };
 
     return (
@@ -43,7 +55,7 @@ const CartDelivery: React.FC = () => {
                         <Radio.Button value="pickup" style={{ width: '50%', textAlign: 'center' }}>
                             Pickup
                         </Radio.Button>
-                        <Radio.Button value="delivery" style={{ width: '50%', textAlign: 'center' }}>
+                        <Radio.Button disabled={true} value="delivery" style={{ width: '50%', textAlign: 'center' }}>
                             Envío a domicilio
                         </Radio.Button>
                     </Radio.Group>
@@ -54,7 +66,7 @@ const CartDelivery: React.FC = () => {
                 <>
                     <Row gutter={16} style={{ marginBottom: 16 }}>
                         <Col span={24}>
-                            <Text strong>Seleccioná una sucursal:</Text>
+                            <Text strong>Seleccioná un punto de entrega</Text>
                             <Select placeholder="Sucursal" style={{ width: '100%' }}>
                                 {pickupLocations.map((loc) => (
                                     <Option key={loc.id} value={loc.id}>
@@ -66,14 +78,15 @@ const CartDelivery: React.FC = () => {
                     </Row>
                     <Row gutter={16}>
                         <Col span={12}>
-                            <Text strong>Elegí una fecha:</Text>
+                            <Text strong>Elegí una fecha</Text>
                             <DatePicker
+                                placeholder = "Fecha futura"
                                 style={{ width: '100%' }}
                                 disabledDate={disablePastDates}
                             />
                         </Col>
                         <Col span={12}>
-                            <Text strong>Elegí un horario:</Text>
+                            <Text strong>Elegí un horario</Text>
                             <Select placeholder="Horario" style={{ width: '100%' }}>
                                 {pickupLocations[0].timeSlots.map((time, idx) => (
                                     <Option key={idx} value={time}>

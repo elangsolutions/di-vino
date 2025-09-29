@@ -59,10 +59,10 @@ const CartPage = () => {
     const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
     return (
-        <>
+        <div style={{height: '100%', padding:'20px'}}>
             <Steps current={current} items={items} />
-            <div>{steps[current].content}</div>
-            <div style={{ marginTop: 24 }}>
+            <div style={{paddingTop:'30px'}}>{steps[current].content}</div>
+            <div style={{ paddingTop: '20px' }}>
                 {current > 0 && (
                     <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
                         Atras
@@ -84,7 +84,7 @@ const CartPage = () => {
                     </Button>
                 )}
             </div>
-        </>
+        </div>
     );
 };
 

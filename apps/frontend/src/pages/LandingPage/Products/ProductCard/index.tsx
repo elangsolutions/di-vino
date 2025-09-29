@@ -62,7 +62,7 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
                     disabled={quantity === 0}
                 />
                 <span>{quantity}</span>
-                <Button icon={<PlusOutlined/>} onClick={handleIncrement}/>
+                <Button type={'primary'} icon={<PlusOutlined/>} onClick={handleIncrement}/>
             </Space>
         </Card>
         <ProductCardModal isOpen={isOpen} close={close} product={product}/>
