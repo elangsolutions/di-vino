@@ -25,8 +25,8 @@ import * as process from "node:process";
       driver: ApolloDriver,
       debug: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      playground: process.env.VERCEL ? false : true,
-      introspection: process.env.VERCEL ?  false :  true
+      playground: !process.env.VERCEL,
+      introspection: !process.env.VERCEL
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
