@@ -24,7 +24,8 @@ import * as process from "node:process";
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       debug: true,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      autoSchemaFile: true,
+      sortSchema: true,
       playground: !process.env.VERCEL,
       introspection: !process.env.VERCEL
     }),
