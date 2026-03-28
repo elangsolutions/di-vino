@@ -1,32 +1,20 @@
 import { ObjectType, Field, ID } from "@nestjs/graphql";
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 
-@Schema()
 @ObjectType()
-export class PaymentPreferenceModel {
+export class PaymentPreference {
     @Field(() => ID)
     id: string;
 
     @Field()
-    @Prop()
     initPoint: string;
 
     @Field({ nullable: true })
-    @Prop()
     sandboxInitPoint?: string;
 
     @Field({ nullable: true })
-    @Prop()
-    status?: string;
-
-    @Field({ nullable: true })
-    @Prop()
     operationType?: string;
 
     @Field({ nullable: true })
-    @Prop()
     dateCreated?: string;
 }
-
-export const PaymentSchema = SchemaFactory.createForClass(PaymentPreferenceModel);
 

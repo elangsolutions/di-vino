@@ -16,4 +16,12 @@ export class ConfigService {
   get mpAccessToken():string | undefined{
     return this.nestConfig.get<string>('MP_ACCESS_TOKEN') || '1234qwerty';
   }
+
+  get mpEnabled(): boolean {
+    return this.nestConfig.get<boolean>('mpEnabled') ?? false;
+  }
+
+  get divinoApp(): string | undefined {
+    return this.nestConfig.get<string>('divinoApp');
+  }
 }

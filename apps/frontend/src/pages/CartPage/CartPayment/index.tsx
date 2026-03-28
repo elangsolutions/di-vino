@@ -1,13 +1,26 @@
 import { QRCodeCanvas } from "qrcode.react";
-import {Card, Space, Typography} from "antd";
+import { Alert, Card, Space, Typography } from "antd";
+import { MERCADOPAGO_ENABLED } from "../../../config/payment";
 const { Title, Text, Link } = Typography;
 
 type PaymentQRProps = {
-    paymentLink: string;
-    amount: number;
+    paymentLink?: string;
+    amount?: number;
 };
 
-const CartPayment =({ paymentLink, amount }: PaymentQRProps)=> {
+const CartPayment = ({ paymentLink, amount }: PaymentQRProps) => {
+    if (!MERCADOPAGO_ENABLED) {
+        return (
+            <Alert
+                type="warning"
+                showIcon
+                message="Pago con Mercado Pago no disponible por el momento"
+                description="Estamos trabajando en esta opción. Podés continuar con tu pedido y coordinar el pago por otro medio."
+                style={{ maxWidth: 480, margin: "0 auto" }}
+            />
+        );
+    }
+
     return (
         <Card
             bordered

@@ -1,7 +1,7 @@
-import { Injectable } from "@nestjs/common";
+import { BadRequestException, Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Model } from "mongoose";
-import { MercadoPagoConfig, Order } from "mercadopago";
+import { MercadoPagoConfig, Preference } from "mercadopago";
 import {PaymentPreferenceModel} from "./payment.schema";
 import {ConfigService} from "../../config/config.service"; // tu schema de pagos en Mongo
 
@@ -13,19 +13,25 @@ export class PaymentService {
         private readonly configService: ConfigService,
     ) {
         this.client = new MercadoPagoConfig({
-            accessToken: this.configService.mpAccessToken
+            accessToken: this.configService.mpAccessToken!
         });
     }
 
     async createQRCode(amount: number, description: string, orderId: string) {
+        if (!this.configService.mpEnabled) {
+            throw new BadRequestException(
+                "Mercado Pago está temporalmente deshabilitado.",
+            );
+        }
 
         try {
 
-            const order = new Order(this.client);
+            const preference = new Preference(this.client);
 
-            const preference = {
+            const preferenceData = {
                 items: [
                     {
+                        id: orderId,
                         title: description,
                         quantity: 1,
                         unit_price: Number(amount),
@@ -33,21 +39,23 @@ export class PaymentService {
                     },
                 ],
                 back_urls: {
-                    success: `${DIVINO_APP}/checkout/${orderId}/success`,
-                    failure: `${DIVINO_APP}/checkout/${orderId}/failure`,
-                    pending: `${DIVINO_APP}/checkout/${orderId}/pending`,
+                    success: `${this.configService.divinoApp}/checkout/${orderId}/success`,
+                    failure: `${this.configService.divinoApp}/checkout/${orderId}/failure`,
+                    pending: `${this.configService.divinoApp}/checkout/${orderId}/pending`,
                 },
                 auto_return: "approved",
             };
 
-            const { body } = await this.client.preferences.create(preference);
+            const body = await preference.create({ body: preferenceData });
 
             await this.paymentModel.create({
                 mpId: body.id,
                 amount,
                 description,
                 initPoint: body.init_point,
-                status: body.status,
+                sandboxInitPoint: body.sandbox_init_point,
+                operationType: body.operation_type,
+                dateCreated: body.date_created,
                 createdAt: new Date(),
                 //orderId
             });
@@ -56,7 +64,6 @@ export class PaymentService {
                 id: body.id,
                 initPoint: body.init_point,
                 sandboxInitPoint: body.sandbox_init_point,
-                status: body.status,
                 operationType: body.operation_type,
                 dateCreated: body.date_created,
             };
