@@ -23,18 +23,6 @@ const App = () => {
             <AuthProvider>
                 <Router>
                     <Layout>
-                        <Header
-                            style={{
-                                display: "flex",
-                                justifyContent: "space-around",
-                                alignContent: "center",
-                                background: "inherit",
-                            }}
-                        >
-                            <Row align={"middle"}>
-                                <Title level={1}>Di Vino</Title>
-                            </Row>
-                        </Header>
                         <Routes>
                             <Route path="/" element={<LandingPage/>}/>
                             <Route path="/login" element={<LoginPage/>}/>

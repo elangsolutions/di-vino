@@ -12,6 +12,7 @@ import {ConfigModule} from './config/config.module';
 import {OrderModule} from "./order/order.module";
 import {ProductModule} from "./product/product.module";
 import {PaymentModule} from "./integrations/payment/payment.module";
+import * as process from "node:process";
 
 @Module({
   controllers: [AppController],
@@ -24,6 +25,8 @@ import {PaymentModule} from "./integrations/payment/payment.module";
       driver: ApolloDriver,
       debug: true,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      playground: process.env.VERCEL ? false : true,
+      introspection: process.env.VERCEL ?  false :  true
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],

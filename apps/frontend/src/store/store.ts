@@ -9,17 +9,18 @@ const preloadedState = loadState();
 export const store = configureStore({
     reducer: {
         cart: cartReducer,
-        productList:productsReducer,
-        devTools: process.env.NODE_ENV !== 'production', // optional
-    },
-    preloadedState,
+        productList: productsReducer,
+    } as any,
+    preloadedState: preloadedState as any,
+    devTools: process.env.NODE_ENV !== 'production',
 });
 
 store.subscribe(() => {
     saveState({
         cart: store.getState().cart,
-        products:store.getState(),
+        productList: store.getState().productList,
     });
 });
+
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;

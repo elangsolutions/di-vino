@@ -136,7 +136,6 @@ const LandingPage: FC = () => {
 
     return (
         <>
-            {/* HEADER */}
             <Layout.Header style={{
                 backgroundColor: '#fff',
                 borderBottom: '1px solid #f0f0f0',
@@ -149,11 +148,10 @@ const LandingPage: FC = () => {
                 zIndex: 100,
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
             }}>
-                <Title level={3} style={{margin: 0, fontSize: isMobile ? 18 : 24}}>
-                    🍷 Di-Vino
+                <Title level={1} style={{margin: 0, fontSize: isMobile ? 18 : 34}}>
+                    Di-Vino
                 </Title>
 
-                {/* DESKTOP CART ICON */}
                 {!isMobile && (
                     <Badge 
                         count={totalItems} 
@@ -173,8 +171,6 @@ const LandingPage: FC = () => {
                         />
                     </Badge>
                 )}
-
-                {/* MOBILE ICONS */}
                 {isMobile && (
                     <Space size={8}>
                         <Badge count={totalItems} style={{backgroundColor: '#5ea18b'}}>
@@ -190,7 +186,6 @@ const LandingPage: FC = () => {
             </Layout.Header>
 
             <Content style={{padding: isMobile ? '16px' : '24px'}}>
-                {/* HERO SECTION */}
                 <section style={{textAlign: 'center', marginBottom: 32}}>
                     <Title level={2} style={{
                         fontSize: isMobile ? 24 : 32,

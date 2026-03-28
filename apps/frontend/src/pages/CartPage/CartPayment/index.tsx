@@ -19,6 +19,7 @@ const CartPayment = () => {
             const qrBase64 = data.createPaymentPreference.qrCodeBase64;
             setQrCode(qrBase64);
             setLoading(false);
+            message.success("QR generado exitosamente");
         },
         onError: (error) => {
             message.error("Error al crear el QR de pago");
@@ -30,8 +31,10 @@ const CartPayment = () => {
     useEffect(() => {
         if (cartTotal > 0 && cartItems.length > 0) {
             generateQR();
+        } else {
+            setQrCode(null);
         }
-    }, []);
+    }, [cartTotal, cartItems.length]);
 
     const generateQR = async () => {
         setLoading(true);
@@ -59,9 +62,20 @@ const CartPayment = () => {
         );
     }
 
+    if (cartTotal === 0 || cartItems.length === 0) {
+        return (
+            <Alert
+                type="info"
+                showIcon
+                message="Carrito vacío"
+                description="Agrega productos a tu carrito para continuar con el pago"
+                style={{ maxWidth: 480, margin: "0 auto" }}
+            />
+        );
+    }
+
     return (
         <Card
-            bordered
             style={{
                 maxWidth: 500,
                 margin: "0 auto",
@@ -75,7 +89,16 @@ const CartPayment = () => {
                     Escaneá el QR para pagar
                 </Title>
 
-                <Text strong>Total a pagar: ${cartTotal}</Text>
+                <div style={{
+                    backgroundColor: '#fafafa',
+                    padding: '16px',
+                    borderRadius: '8px',
+                    border: '1px solid #f0f0f0'
+                }}>
+                    <Text strong style={{ fontSize: 18, color: '#5ea18b' }}>
+                        Total a pagar: ${cartTotal.toLocaleString('es-AR')}
+                    </Text>
+                </div>
 
                 {loading ? (
                     <div style={{ padding: "40px 20px" }}>
@@ -83,24 +106,43 @@ const CartPayment = () => {
                     </div>
                 ) : qrCode ? (
                     <>
-                        <div style={{ textAlign: "center", padding: "20px 0" }}>
+                        <div style={{ 
+                            textAlign: "center", 
+                            padding: "20px",
+                            backgroundColor: '#f5f5f5',
+                            borderRadius: '8px',
+                            border: '1px solid #e8e8e8'
+                        }}>
                             <img
                                 src={qrCode}
                                 alt="QR Code de Pago"
-                                style={{ maxWidth: 220, height: "auto" }}
+                                style={{ 
+                                    maxWidth: 280, 
+                                    height: "auto",
+                                    borderRadius: '4px'
+                                }}
                             />
                         </div>
-                        <Button type="primary" onClick={generateQR}>
+                        <Button 
+                            type="primary" 
+                            onClick={generateQR}
+                            style={{ width: '100%', height: 44 }}
+                        >
                             Generar Nuevo QR
                         </Button>
                     </>
                 ) : (
-                    <Button type="primary" onClick={generateQR} loading={loading}>
+                    <Button 
+                        type="primary" 
+                        onClick={generateQR} 
+                        loading={loading}
+                        style={{ width: '100%', height: 44 }}
+                    >
                         Generar QR
                     </Button>
                 )}
 
-                <Text>
+                <Text type="secondary" style={{ fontSize: 13 }}>
                     Una vez confirmada tu compra tu Orden se prepara para el despacho en la fecha solicitada
                 </Text>
             </Space>
