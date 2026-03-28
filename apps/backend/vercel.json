@@ -1,5 +1,5 @@
 {
   "routes": [
-    { "src": "^/graphql$", "dest": "/graphql.ts" }
+    { "src": "^/graphql$", "dest": "/api/main.ts" }
   ]
 }
