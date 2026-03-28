@@ -6,3 +6,125 @@
 .catalog-section {
     padding-bottom: 30px;
 }
+
+/* Mobile-first responsive styles */
+@media (max-width: 768px) {
+    .ant-layout-header {
+        padding: 12px 16px !important;
+    }
+
+    .ant-layout-content {
+        padding: 16px !important;
+    }
+
+    .ant-title {
+        font-size: 18px !important;
+    }
+
+    .filter-section {
+        margin-bottom: 20px;
+    }
+
+    /* Ensure proper spacing for mobile */
+    .ant-row-rtl,
+    .ant-row {
+        width: 100%;
+    }
+}
+
+/* Desktop styles */
+@media (min-width: 769px) {
+    .ant-layout-header {
+        padding: 16px 24px !important;
+    }
+
+    .ant-layout-content {
+        padding: 24px !important;
+    }
+
+    .filter-section {
+        margin-bottom: 32px;
+    }
+}
+
+/* Smooth transitions */
+.ant-btn {
+    transition: all 0.3s ease !important;
+}
+
+.ant-select:hover {
+    border-color: #5ea18b !important;
+}
+
+.ant-slider-track {
+    background-color: #5ea18b !important;
+}
+
+.ant-slider-handle {
+    border-color: #5ea18b !important;
+}
+
+.ant-slider-handle:focus {
+    box-shadow: 0 0 0 5px rgba(94, 161, 139, 0.1) !important;
+}
+
+/* Header shadow and styling */
+.ant-layout-header {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Cart icon hover effect */
+.ant-btn-text:hover {
+    color: #5ea18b !important;
+    transform: scale(1.1);
+    transition: all 0.2s ease;
+}
+
+/* Filter button styling */
+.ant-btn-default {
+    border-color: #d9d9d9;
+}
+
+.ant-btn-default:hover {
+    border-color: #5ea18b;
+    color: #5ea18b;
+}
+
+/* Drawer styling for mobile filters */
+.ant-drawer-header {
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.ant-drawer-body {
+    padding: 20px;
+}
+
+/* Product grid responsive */
+@media (max-width: 576px) {
+    .ant-row-gutter-16 > .ant-col {
+        width: 100%;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 768px) {
+    .ant-row-gutter-16 > .ant-col {
+        width: 50%;
+    }
+}
+
+/* Smooth fade-in animation */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+section {
+    animation: fadeIn 0.5s ease-in-out;
+}
+

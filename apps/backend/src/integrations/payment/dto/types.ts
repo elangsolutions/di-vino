@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID } from "@nestjs/graphql";
+import { ObjectType, Field, ID, Float } from "@nestjs/graphql";
 
 @ObjectType()
 export class PaymentPreference {
@@ -6,15 +6,18 @@ export class PaymentPreference {
     id: string;
 
     @Field()
-    initPoint: string;
+    qrCode: string;
 
-    @Field({ nullable: true })
-    sandboxInitPoint?: string;
+    @Field()
+    qrCodeBase64: string;
 
-    @Field({ nullable: true })
-    operationType?: string;
+    @Field(() => Float)
+    amount: number;
 
-    @Field({ nullable: true })
-    dateCreated?: string;
+    @Field()
+    description: string;
+
+    @Field()
+    externalReference: string;
 }
 

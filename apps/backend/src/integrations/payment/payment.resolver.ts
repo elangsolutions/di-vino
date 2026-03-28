@@ -1,4 +1,3 @@
-import { BadRequestException } from '@nestjs/common';
 import { Resolver, Mutation, Args } from '@nestjs/graphql';
 import {PaymentPreference} from "./dto/types";
 import {PaymentService} from "./payment.service";
@@ -23,10 +22,11 @@ export class PaymentResolver {
 
         return {
             id: preference.id,
-            initPoint: preference.initPoint,
-            sandboxInitPoint: preference.sandboxInitPoint,
-            operationType: preference.operationType,
-            dateCreated: preference.dateCreated,
+            qrCode: preference.qrCode,
+            qrCodeBase64: preference.qrCodeBase64,
+            amount: preference.amount,
+            description: preference.description,
+            externalReference: preference.externalReference,
         };
     }
 }

@@ -1,4 +1,4 @@
-schema: 'http://localhost:3000/graphql' # or your SDL file like src/schema.gql
+schema: '../backend/src/schema.gql'
 documents: 'src/**/*.ts' # for queries/mutations (if using)
 generates:
   src/generated/graphql.ts:

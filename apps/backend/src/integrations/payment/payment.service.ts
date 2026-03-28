@@ -9,7 +9,7 @@ import {ConfigService} from "../../config/config.service"; // tu schema de pagos
 export class PaymentService {
     client:MercadoPagoConfig;
     constructor(
-        @InjectModel("Payment") private paymentModel: Model<PaymentPreferenceModel>,
+        @InjectModel(PaymentPreferenceModel.name) private paymentModel: Model<PaymentPreferenceModel>,
         private readonly configService: ConfigService,
     ) {
         this.client = new MercadoPagoConfig({
@@ -25,7 +25,6 @@ export class PaymentService {
         }
 
         try {
-
             const preference = new Preference(this.client);
 
             const preferenceData = {
@@ -48,6 +47,9 @@ export class PaymentService {
 
             const body = await preference.create({ body: preferenceData });
 
+            // Generate QR code from init point using a QR code service
+            const qrCodeBase64 = await this.generateQRCodeBase64(body.init_point || "");
+
             await this.paymentModel.create({
                 mpId: body.id,
                 amount,
@@ -62,14 +64,27 @@ export class PaymentService {
 
             return {
                 id: body.id,
-                initPoint: body.init_point,
-                sandboxInitPoint: body.sandbox_init_point,
-                operationType: body.operation_type,
-                dateCreated: body.date_created,
+                qrCode: body.init_point,
+                qrCodeBase64: qrCodeBase64,
+                amount: amount,
+                description: description,
+                externalReference: orderId,
             };
         } catch (error) {
-            console.error("Error creando preferencia de pago:", error);
+            console.error("Error creando QR de pago:", error);
             throw error;
+        }
+    }
+
+    private async generateQRCodeBase64(url: string): Promise<string> {
+        try {
+            // Use QR code service to generate base64 QR code
+            const QRCode = await import("qrcode");
+            return await QRCode.toDataURL(url);
+        } catch (error) {
+            console.error("Error generating QR code:", error);
+            // Return a placeholder if QR generation fails
+            return "";
         }
     }
 }

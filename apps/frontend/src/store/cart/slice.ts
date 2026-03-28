@@ -31,4 +31,29 @@ const slice = createSlice({
 
 export const { increment, decrement, remove } = slice.actions;
 export default slice.reducer;
-export const getCartItemsCount = (state: RootState) => Object.keys(state.cart.quantities)?.length||0;
+
+export const getCartItemsCount = (state: RootState) => Object.keys(state.cart.quantities)?.length || 0;
+
+export const selectCartItems = (state: RootState) => {
+    const quantities = state.cart.quantities;
+    const products = state.productList;
+    
+    return Object.entries(quantities)
+        .filter(([_, qty]) => qty > 0)
+        .map(([productId, quantity]) => {
+            const product = products.find((p: any) => p._id === productId);
+            return {
+                productId,
+                quantity,
+                product,
+            };
+        });
+};
+
+export const selectCartTotal = (state: RootState) => {
+    const cartItems = selectCartItems(state);
+    return cartItems.reduce((total, item) => {
+        const price = item.product?.price || 0;
+        return total + (price * item.quantity);
+    }, 0);
+};

@@ -56,6 +56,15 @@ type Product {
   image: String
 }
 
+type PaymentPreference {
+  id: ID!
+  qrCode: String!
+  qrCodeBase64: String!
+  amount: Float!
+  description: String!
+  externalReference: String!
+}
+
 type Query {
   orders: [Order!]!
   products: [Product!]!
@@ -68,6 +77,7 @@ type Mutation {
   createOrder(input: CreateOrderDraftInput!): Order!
   addProduct(input: AddProductInput!): Product!
   deleteProduct(input: RemoveProductInput!): Product!
+  createPaymentPreference(amount: Float!, description: String!, orderId: String!): PaymentPreference!
 }
 
 input RegisterInput {

@@ -12,6 +12,7 @@
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@fontsource/eb-garamond": "^5.2.7",
+    "@fontsource/inter": "^5.2.8",
     "@mercadopago/sdk-react": "^1.0.3",
     "@reduxjs/toolkit": "^2.8.2",
     "add": "^2.0.6",

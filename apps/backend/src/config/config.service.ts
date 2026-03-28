@@ -18,7 +18,7 @@ export class ConfigService {
   }
 
   get mpEnabled(): boolean {
-    return this.nestConfig.get<boolean>('mpEnabled') ?? false;
+    return this.nestConfig.get<boolean>('MP_ENABLED') ?? false;
   }
 
   get divinoApp(): string | undefined {

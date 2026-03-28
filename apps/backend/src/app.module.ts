@@ -11,6 +11,7 @@ import {join} from 'path';
 import {ConfigModule} from './config/config.module';
 import {OrderModule} from "./order/order.module";
 import {ProductModule} from "./product/product.module";
+import {PaymentModule} from "./integrations/payment/payment.module";
 
 @Module({
   controllers: [AppController],
@@ -32,7 +33,8 @@ import {ProductModule} from "./product/product.module";
     }),
     AuthModule,
     OrderModule,
-    ProductModule
+    ProductModule,
+    PaymentModule
   ],
   providers: [AppService],
 })
