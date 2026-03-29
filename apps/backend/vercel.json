@@ -1,5 +1,10 @@
 {
   "routes": [
     { "src": "^/graphql$", "dest": "/api/main.ts" }
-  ]
+  ],
+  "functions": {
+    "api/main.ts": {
+      "maxDuration": 30
+    }
+  }
 }

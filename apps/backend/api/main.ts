@@ -24,7 +24,6 @@ async function bootstrap() {
 }
 
 export default async function handler(req, res) {
-  res.status(200).send("Hello World");
-  // const server = await bootstrap();
-  // return server(req, res);
+  const server = await bootstrap();
+  return server(req, res);
 }
