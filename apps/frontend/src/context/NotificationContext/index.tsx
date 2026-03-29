@@ -2,8 +2,8 @@ import { createContext, useContext } from "react";
 import { notification } from "antd";
 
 export const NotificationContext = createContext({
-    notifySuccess: (message: string, description?: string) => {},
-    notifyError: (message: string, description?: string) => {},
+    notifySuccess: (_message: string, _description?: string) => {},
+    notifyError: (_message: string, _description?: string) => {},
 });
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {

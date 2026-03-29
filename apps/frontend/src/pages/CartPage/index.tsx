@@ -1,4 +1,4 @@
-import {FC, useState} from 'react';
+import {useState} from 'react';
 import {Button, message, Steps} from 'antd';
 import CartList from "./CartList";
 import {useDispatch, useSelector} from "react-redux";

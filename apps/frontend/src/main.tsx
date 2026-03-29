@@ -1,4 +1,4 @@
-import { StrictMode, useEffect, useState } from 'react';
+import { StrictMode, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/500.css';
@@ -12,7 +12,7 @@ import { ConfigProvider, theme as antdTheme, App as AntdApp } from 'antd';
 import { NotificationProvider } from './context/NotificationContext';
 
 const Root = () => {
-    const [isDarkMode, setIsDarkMode] = useState(false);
+    const [isDarkMode] = useState(false);
 
     return (
         <ConfigProvider

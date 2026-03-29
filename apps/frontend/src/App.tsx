@@ -2,7 +2,7 @@ import './App.css';
 import LandingPage from "./pages/LandingPage";
 import AdminPage from "./pages/AdminPage";
 import LoginPage from "./pages/LoginPage";
-import {Layout, Row, Typography,} from "antd";
+import {Layout} from "antd";
 import {BrowserRouter as Router, Navigate, Route, Routes} from "react-router-dom";
 import {AuthProvider} from "./context/AuthContext";
 import {PrivateRoute} from "./components/routes/PrivateRoute";
@@ -13,8 +13,6 @@ import {store} from './store/store';
 import ProductListPage from "./pages/AdminPage/Products/ProductList";
 import CartPage from "./pages/CartPage";
 
-const {Title} = Typography;
-const {Header} = Layout;
 
 const App = () => {
 

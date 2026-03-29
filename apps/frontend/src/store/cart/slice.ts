@@ -1,8 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import {RootState} from "@reduxjs/toolkit/query";
 
 interface CartState {
-    quantities: Record<string, number>; // key = product.id
+    quantities: Record<string, number>;
 }
 
 const initialState: CartState = {
@@ -32,15 +31,15 @@ const slice = createSlice({
 export const { increment, decrement, remove } = slice.actions;
 export default slice.reducer;
 
-export const getCartItemsCount = (state: RootState) => Object.keys(state.cart.quantities)?.length || 0;
+export const getCartItemsCount = (state: any) => Object.keys(state.cart.quantities)?.length || 0;
 
-export const selectCartItems = (state: RootState) => {
+export const selectCartItems = (state: any) => {
     const quantities = state.cart.quantities;
     const products = state.productList;
     
     return Object.entries(quantities)
-        .filter(([_, qty]) => qty > 0)
-        .map(([productId, quantity]) => {
+        .filter(([_, qty]: any) => qty > 0)
+        .map(([productId, quantity]: any) => {
             const product = products.find((p: any) => p._id === productId);
             return {
                 productId,
@@ -50,9 +49,9 @@ export const selectCartItems = (state: RootState) => {
         });
 };
 
-export const selectCartTotal = (state: RootState) => {
+export const selectCartTotal = (state: any) => {
     const cartItems = selectCartItems(state);
-    return cartItems.reduce((total, item) => {
+    return cartItems.reduce((total, item: any) => {
         const price = item.product?.price || 0;
         return total + (price * item.quantity);
     }, 0);

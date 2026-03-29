@@ -5,7 +5,7 @@ import {useDisclosure} from "../../../../components/hooks/useDisclosure.tsx";
 import ProductCardModal from "../ProductCardModal";
 import {Product} from "../../../../generated/graphql.ts";
 import NO_IMAGE from "../../../../assets/place_holder.png";
-import {RootState} from "@reduxjs/toolkit/query";
+import { RootState } from "../../../../store/store";
 import {useDispatch, useSelector} from "react-redux";
 import {decrement, increment} from "../../../../store/cart/slice.ts";
 import {priceFormat} from "../../../../utils";

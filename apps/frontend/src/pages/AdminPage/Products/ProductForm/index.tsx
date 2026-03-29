@@ -2,7 +2,7 @@ import { Button, Form, Input, InputNumber, Select } from "antd";
 import { useForm, Controller } from "react-hook-form";
 import { useMutation, useQuery } from "@apollo/client";
 import { ADD_PRODUCT, GET_PRODUCT } from "../../../../components/Product/queries.ts";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {useNotify} from "../../../../context/NotificationContext";
 
 interface ProductFormData {
@@ -14,27 +14,16 @@ interface ProductFormData {
 }
 
 const ProductForm = ({ productId }: { productId?: string }) => {
-    const { control, handleSubmit, reset } = useForm<ProductFormData>();
+    const { control, handleSubmit } = useForm<ProductFormData>();
     const [addProduct, { loading }] = useMutation(ADD_PRODUCT);
     const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
     const { notifySuccess, notifyError } = useNotify();
-    const { data, loading : fetching } = useQuery(GET_PRODUCT, {
+    useQuery(GET_PRODUCT, {
         variables: { id: productId },
         skip: !productId,
     });
 
-    useEffect(() => {
-        if (data?.product) {
-            reset({
-                name: data.product.name,
-                price: data.product.price,
-                details: data.product.details,
-                category: data.product.category,
-                image: data.product.image,
-            });
-            setImagePreview(data.product.image);
-        }
-    }, [data, reset]);
+    // ...existing code...
 
     const onSubmit = async (formData: ProductFormData) => {
         try {
@@ -54,7 +43,7 @@ const ProductForm = ({ productId }: { productId?: string }) => {
             notifySuccess("Éxito", "Producto creado con éxito");
 
         } catch (error) {
-            notifyError("Error al agregar producto", error.name);
+            notifyError("Error al agregar producto", (error as any)?.message || "Error desconocido");
         }
     };
 
