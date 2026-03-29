@@ -26,8 +26,9 @@ import * as process from "node:process";
       debug: true,
       autoSchemaFile: true,
       sortSchema: true,
-      playground: !process.env.VERCEL,
-      introspection: !process.env.VERCEL
+      playground: true,
+      introspection: true,
+      csrfPrevention: false,
     }),
     MongooseModule.forRootAsync({
       inject: [ConfigService],
