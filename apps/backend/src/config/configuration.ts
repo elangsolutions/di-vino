@@ -6,4 +6,5 @@ export default () => ({
   /** Mercado Pago is off unless MP_ENABLED=true */
   mpEnabled: process.env.MP_ENABLED === 'true',
   divinoApp: process.env.DIVINO_APP,
+  frontendUrl: process.env.FRONTEND_URL || 'http://localhost:5173',
 });

@@ -24,4 +24,8 @@ export class ConfigService {
   get divinoApp(): string | undefined {
     return this.nestConfig.get<string>('divinoApp');
   }
+
+  get frontendUrl(): string {
+    return this.nestConfig.get<string>('frontendUrl') || 'http://localhost:5173';
+  }
 }
