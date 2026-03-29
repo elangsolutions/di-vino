@@ -25,7 +25,8 @@ export class ConfigService {
     return this.nestConfig.get<string>('divinoApp');
   }
 
-  get frontendUrl(): string {
-    return this.nestConfig.get<string>('frontendUrl') || 'http://localhost:5173';
+  get frontendUrls(): string[] {
+    const urls = this.nestConfig.get<string>('frontendUrls') || 'http://localhost:5173';
+    return urls.split('|').map(url => url.trim());
   }
 }
