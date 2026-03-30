@@ -185,13 +185,13 @@ const LandingPage: FC = () => {
                 )}
             </Layout.Header>
 
-            <Content style={{padding: isMobile ? '16px' : '24px'}}>
+            <Content style={{padding: isMobile ? '1px' : '24px'}}>
                 <section style={{textAlign: 'center', marginBottom: 32}}>
                     <Title level={2} style={{
                         fontSize: isMobile ? 24 : 32,
                         marginBottom: 8
                     }}>
-                        Una nueva forma de comprar
+                        Una nueva forma de disfrutar
                     </Title>
                     <Text type="secondary">
                         Descubre nuestra selección premium de vinos

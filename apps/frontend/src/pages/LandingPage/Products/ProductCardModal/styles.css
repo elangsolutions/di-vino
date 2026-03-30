@@ -1,0 +1,176 @@
+/* Mobile-First Responsive Product Modal */
+
+.product-modal {
+    width: 100% !important;
+}
+
+.product-modal :where(.ant-modal-content) {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.product-modal-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    min-height: auto;
+    padding: 8px 0;
+}
+
+/* Mobile: 320px - 480px */
+@media (max-width: 480px) {
+    .product-modal :where(.ant-modal) {
+        max-width: calc(100vw - 16px);
+        width: 100% !important;
+    }
+
+    .product-modal-image {
+        width: 100%;
+        max-width: 320px;
+        height: auto;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .product-modal-details {
+        font-size: 13px;
+        line-height: 1.5;
+        max-width: 100%;
+        margin: 0;
+        padding: 0 4px;
+        color: rgba(0, 0, 0, 0.65);
+    }
+}
+
+/* Tablet: 481px - 768px */
+@media (min-width: 481px) and (max-width: 768px) {
+    .product-modal :where(.ant-modal) {
+        max-width: 90vw;
+        width: 100% !important;
+    }
+
+    .product-modal-image {
+        width: 100%;
+        max-width: 350px;
+        height: auto;
+        margin-bottom: 16px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .product-modal-details {
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 350px;
+        margin: 0;
+        padding: 0 12px;
+        color: rgba(0, 0, 0, 0.65);
+    }
+}
+
+/* Desktop: 769px and above */
+@media (min-width: 769px) {
+    .product-modal :where(.ant-modal) {
+        max-width: 600px;
+        width: 600px !important;
+    }
+
+    .product-modal-image {
+        width: 100%;
+        max-width: 400px;
+        height: auto;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .product-modal-details {
+        font-size: 14px;
+        line-height: 1.6;
+        max-width: 400px;
+        margin: 0;
+        padding: 0;
+        color: rgba(0, 0, 0, 0.65);
+    }
+}
+
+/* Large Desktop: 1200px and above */
+@media (min-width: 1200px) {
+    .product-modal :where(.ant-modal) {
+        max-width: 700px;
+        width: 700px !important;
+    }
+
+    .product-modal-image {
+        width: 100%;
+        max-width: 450px;
+        height: auto;
+        margin-bottom: 24px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
+
+    .product-modal-details {
+        font-size: 15px;
+        line-height: 1.7;
+        max-width: 450px;
+        margin: 0;
+        color: rgba(0, 0, 0, 0.65);
+    }
+}
+
+/* Smooth animations */
+.product-modal :where(.ant-modal-content) {
+    animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Image hover effect */
+.product-modal-image {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.product-modal-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Modal overlay enhancement */
+.product-modal :where(.ant-modal-mask) {
+    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.55) !important;
+}
+
+/* Close button positioning for better mobile UX */
+.product-modal :where(.ant-modal-close) {
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.product-modal :where(.ant-modal-close):hover {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+

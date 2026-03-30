@@ -1,6 +1,7 @@
 import { Modal } from "antd";
 import { Product } from "../../../../generated/graphql.ts";
 import NO_IMAGE from "../../../../assets/place_holder.png";
+import "./styles.css";
 
 type ProductCardModalProps = {
     isOpen: boolean;
@@ -14,26 +15,18 @@ const ProductCardModal = ({ isOpen, close, product }: ProductCardModalProps) => 
             open={isOpen}
             onCancel={close}
             footer={null}
-            closeIcon={false} // 👈 hide the X button
-            centered // 👈 centers modal itself in the screen
+            closeIcon={false}
+            centered
+            className="product-modal"
         >
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    textAlign: "center",
-                    minHeight: "300px", // gives vertical space for centering
-                }}
-            >
+            <div className="product-modal-container">
                 <img
-                    style={{ width: "400px", marginBottom: "16px" }}
+                    className="product-modal-image"
                     alt={product.name}
                     src={product.image || NO_IMAGE}
                 />
                 {product.details && (
-                    <p style={{ maxWidth: "400px" }}>{product.details}</p>
+                    <p className="product-modal-details">{product.details}</p>
                 )}
             </div>
         </Modal>
