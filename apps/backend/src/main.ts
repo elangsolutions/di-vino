@@ -9,7 +9,9 @@ async function bootstrap() {
      //   .map(url => url.trim());
 
     app.enableCors({
-        origin: '*',
+        origin: true,
+        methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+        allowedHeaders: '*',
     });
 
     await app.listen(process.env.PORT ?? 3000);
