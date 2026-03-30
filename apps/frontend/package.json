@@ -6,6 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "codegen": "graphql-codegen",
+    "codegen:watch": "graphql-codegen --watch",
     "lint": "eslint .",
     "preview": "vite preview"
   },
