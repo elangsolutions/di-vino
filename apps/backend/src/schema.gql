@@ -2,43 +2,34 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
-type Address {
-  street: String!
+input AddAddressInput {
   city: String!
   postalCode: String!
   province: String!
+  street: String!
 }
 
-type Delivery {
-  type: DeliveryType!
-  locationId: String
-  address: Address
-}
-
-enum DeliveryType {
-  PICKUP
-  ADDRESS
-}
-
-type OrderItem {
-  productId: String!
-  title: String!
+input AddProductInput {
+  _id: String
+  category: String!
+  details: String!
+  image: String
+  name: String!
   price: Float!
-  quantity: Float!
 }
 
-type Order {
-  _id: ID!
-  items: [OrderItem!]!
-  delivery: Delivery!
+type Address {
+  city: String!
+  postalCode: String!
+  province: String!
+  street: String!
+}
+
+input CreateOrderDraftInput {
+  delivery: DeliveryInput!
+  items: [OrderItemInput!]!
+  state: OrderState!
   userId: String!
-  status: String!
-  mpPreferenceId: String
-  external_reference: String!
-  mpInitPoint: String
-  mpQrData: String
-  createdAt: DateTime!
-  updatedAt: DateTime!
 }
 
 """
@@ -46,43 +37,21 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
-type Product {
-  _id: ID!
-  name: String!
-  details: String
-  price: Float!
-  category: String!
-  stock: Float!
-  image: String
+type Delivery {
+  address: Address
+  locationId: String
+  type: DeliveryType!
 }
 
-type PaymentPreference {
-  id: ID!
-  qrCode: String!
-  qrCodeBase64: String!
-  amount: Float!
-  description: String!
-  externalReference: String!
+input DeliveryInput {
+  address: AddAddressInput
+  locationId: String
+  type: DeliveryType!
 }
 
-type Query {
-  orders: [Order!]!
-  products: [Product!]!
-  product(id: String!): Product!
-}
-
-type Mutation {
-  register(input: RegisterInput!): String!
-  login(input: LoginInput!): String!
-  createOrder(input: CreateOrderDraftInput!): Order!
-  addProduct(input: AddProductInput!): Product!
-  deleteProduct(input: RemoveProductInput!): Product!
-  createPaymentPreference(amount: Float!, description: String!, orderId: String!): PaymentPreference!
-}
-
-input RegisterInput {
-  email: String!
-  password: String!
+enum DeliveryType {
+  ADDRESS
+  PICKUP
 }
 
 input LoginInput {
@@ -90,48 +59,79 @@ input LoginInput {
   password: String!
 }
 
-input CreateOrderDraftInput {
-  state: OrderState!
-  items: [OrderItemInput!]!
-  delivery: DeliveryInput!
+type Mutation {
+  addProduct(input: AddProductInput!): Product!
+  createOrder(input: CreateOrderDraftInput!): Order!
+  createPaymentPreference(amount: Float!, description: String!, orderId: String!): PaymentPreference!
+  deleteProduct(input: RemoveProductInput!): Product!
+  login(input: LoginInput!): String!
+  register(input: RegisterInput!): String!
+}
+
+type Order {
+  _id: ID!
+  createdAt: DateTime!
+  delivery: Delivery!
+  external_reference: String!
+  items: [OrderItem!]!
+  mpInitPoint: String
+  mpPreferenceId: String
+  mpQrData: String
+  status: String!
+  updatedAt: DateTime!
   userId: String!
 }
 
-enum OrderState {
-  DRAFT
-  OPEN
-  PAID
-  DELIVERED
-  CLOSED
+type OrderItem {
+  price: Float!
+  productId: String!
+  quantity: Float!
+  title: String!
 }
 
 input OrderItemInput {
+  price: Float!
   productId: String!
-  title: String!
-  price: Float!
   quantity: Float!
+  title: String!
 }
 
-input DeliveryInput {
-  type: DeliveryType!
-  locationId: String
-  address: AddAddressInput
+enum OrderState {
+  CLOSED
+  DELIVERED
+  DRAFT
+  OPEN
+  PAID
 }
 
-input AddAddressInput {
-  street: String!
-  city: String!
-  postalCode: String!
-  province: String!
+type PaymentPreference {
+  amount: Float!
+  description: String!
+  externalReference: String!
+  id: ID!
+  qrCode: String!
+  qrCodeBase64: String!
 }
 
-input AddProductInput {
-  _id: String
-  name: String!
-  details: String!
+type Product {
+  _id: ID!
   category: String!
-  price: Float!
+  details: String
   image: String
+  name: String!
+  price: Float!
+  stock: Float!
+}
+
+type Query {
+  orders: [Order!]!
+  product(id: String!): Product!
+  products: [Product!]!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
 }
 
 input RemoveProductInput {

@@ -24,7 +24,7 @@ import * as process from "node:process";
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       debug: true,
-      autoSchemaFile: true,
+      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       playground: true,
       introspection: true,
