@@ -6,7 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-    "build": "nest build",
+    "build": "nest build && npm run generate:schema",
+    "build:commit": "nest build && npm run generate:schema && npm run schema:commit",
+    "schema:commit": "git add src/schema.gql && git commit -m 'chore: update graphql schema' || true",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "dev": "nest start --watch",
