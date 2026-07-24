@@ -1,20 +1,17 @@
 import {FC, useEffect, useState, useMemo} from 'react';
-import {Alert, Badge, Col, Layout, Row, Spin, Typography, Select, Slider, Button, Drawer, Space, Divider} from 'antd';
-import {FilterOutlined, ShoppingCartOutlined} from '@ant-design/icons';
+import {Alert, Badge, Col, Layout, Row, Spin, Typography, Select, Slider, Button, Drawer, Space, Divider, Tag} from 'antd';
+import {FilterOutlined, ShoppingCartOutlined, CloseOutlined} from '@ant-design/icons';
 import './index.css';
 import ProductCard from "./Products/ProductCard";
 import {useGetProducts} from "../../components/Product/hooks/useGetProducts.ts";
 import {Product} from "../../generated/graphql.ts";
 import {useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
-import type {RootState} from '../../store/store';
 import {cacheProducts} from "../../store/product/slice.ts";
+import {getCartUnitsCount} from "../../store/cart/slice.ts";
 
 const {Title, Text} = Typography;
 const {Content, Footer} = Layout;
-
-const quantitySum = (quantities: Record<string, number>) =>
-    Object.values(quantities).reduce((sum, q) => sum + q, 0);
 
 const currencyFormatter = (val?: number) => {
     if (val == null) return "";
@@ -29,12 +26,12 @@ const LandingPage: FC = () => {
     const {products, loading, error} = useGetProducts();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const cartQuantities = useSelector((state: RootState) => state.cart.quantities);
-    const totalItems = quantitySum(cartQuantities);
+    const totalItems = useSelector(getCartUnitsCount);
 
     // --- filter states ---
     const [category, setCategory] = useState<string | null>(null);
-    const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
+    // null = no price filter applied yet; the slider still shows the full computed range.
+    const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
     const [showMobileFilters, setShowMobileFilters] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
@@ -45,15 +42,38 @@ const LandingPage: FC = () => {
     }, [products, dispatch]);
 
     useEffect(() => {
+        let resizeTimeout: ReturnType<typeof setTimeout>;
         const handleResize = () => {
-            setIsMobile(window.innerWidth < 768);
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                setIsMobile(window.innerWidth < 768);
+            }, 150);
         };
         window.addEventListener('resize', handleResize);
-        return () => window.removeEventListener('resize', handleResize);
+        return () => {
+            clearTimeout(resizeTimeout);
+            window.removeEventListener('resize', handleResize);
+        };
     }, []);
 
     const handleCartClick = () => {
         navigate('/cart');
+    };
+
+    const priceBounds = useMemo<[number, number]>(() => {
+        if (!products.length) return [0, 100000];
+        const prices = products.map((p: Product) => p.price);
+        return [Math.min(...prices), Math.max(...prices)];
+    }, [products]);
+
+    const activePriceRange = priceRange ?? priceBounds;
+    const isPriceFiltered = priceRange != null
+        && (priceRange[0] > priceBounds[0] || priceRange[1] < priceBounds[1]);
+    const activeFilterCount = (category ? 1 : 0) + (isPriceFiltered ? 1 : 0);
+
+    const clearFilters = () => {
+        setCategory(null);
+        setPriceRange(null);
     };
 
     const filteredProducts = useMemo(() => {
@@ -64,13 +84,13 @@ const LandingPage: FC = () => {
                 pass = false;
             }
 
-            if (p.price < priceRange[0] || p.price > priceRange[1]) {
+            if (p.price < activePriceRange[0] || p.price > activePriceRange[1]) {
                 pass = false;
             }
 
             return pass;
         });
-    }, [products, category, priceRange]);
+    }, [products, category, activePriceRange]);
 
     if (loading) return <Spin tip="Cargando..." style={{display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh'}} />;
     if (error) return <Alert type="error" message="Error cargando productos" description={error.message} />;
@@ -83,6 +103,7 @@ const LandingPage: FC = () => {
                 <Text strong style={{fontSize: 14}}>Categoría</Text>
                 <Select
                     placeholder="Selecciona categoría"
+                    size="large"
                     style={{ width: '100%', marginTop: 8 }}
                     value={category || 'Todas'}
                     onChange={(value) => setCategory(value === 'Todas' ? null : value)}
@@ -102,30 +123,33 @@ const LandingPage: FC = () => {
                 <Text strong style={{fontSize: 14}}>Rango de Precio</Text>
                 <div style={{marginTop: 12}}>
                     <Text type="secondary" style={{fontSize: 12}}>
-                        {currencyFormatter(priceRange[0])} - {currencyFormatter(priceRange[1])}
+                        {currencyFormatter(activePriceRange[0])} - {currencyFormatter(activePriceRange[1])}
                     </Text>
                 </div>
-                <Slider
-                    range
-                    min={0}
-                    step={5000}
-                    max={100000}
-                    value={priceRange}
-                    onChange={(v) => setPriceRange(v as [number, number])}
-                    tooltip={{formatter: currencyFormatter}}
-                    marks={{
-                        0: '$0',
-                        50000: '$50k',
-                        100000: '$100k',
-                    }}
-                    style={{marginTop: 12}}
-                />
+                <div style={{padding: '0 6px', marginTop: 12}}>
+                    <Slider
+                        range
+                        min={priceBounds[0]}
+                        max={priceBounds[1]}
+                        step={Math.max(1, Math.round((priceBounds[1] - priceBounds[0]) / 20))}
+                        value={activePriceRange}
+                        onChange={(v) => setPriceRange(v as [number, number])}
+                        tooltip={{formatter: currencyFormatter}}
+                    />
+                </div>
             </div>
+
+            {activeFilterCount > 0 && (
+                <Button block onClick={clearFilters}>
+                    Limpiar filtros
+                </Button>
+            )}
 
             {showMobileFilters && (
                 <Button 
                     type="primary" 
                     block 
+                    size="large"
                     onClick={() => setShowMobileFilters(false)}
                 >
                     Aplicar Filtros
@@ -185,7 +209,7 @@ const LandingPage: FC = () => {
                 )}
             </Layout.Header>
 
-            <Content style={{padding: isMobile ? '1px' : '24px'}}>
+            <Content style={{padding: isMobile ? '12px' : '24px'}}>
                 <section style={{textAlign: 'center', marginBottom: 32}}>
                     <Title level={2} style={{
                         fontSize: isMobile ? 24 : 32,
@@ -208,68 +232,103 @@ const LandingPage: FC = () => {
                             borderRadius: 8,
                             border: '1px solid #f0f0f0'
                         }}>
-                            <Row gutter={[16, 16]} align="middle">
-                                <Col flex="auto">
-                                    <Text strong>Filtrar por:</Text>
+                            <div style={{
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                alignItems: 'center',
+                                marginBottom: 16
+                            }}>
+                                <Text strong>Filtrar por:</Text>
+                                {activeFilterCount > 0 && (
+                                    <Button type="text" onClick={clearFilters}>
+                                        Limpiar filtros
+                                    </Button>
+                                )}
+                            </div>
+                            <Row gutter={[32, 16]} align="top">
+                                <Col xs={24} md={8} lg={6}>
+                                    <Text type="secondary" style={{fontSize: 12}}>Categoría</Text>
+                                    <Select
+                                        placeholder="Todas"
+                                        style={{ width: '100%', marginTop: 4, minWidth: 160 }}
+                                        value={category || 'Todas'}
+                                        onChange={(value) => setCategory(value === 'Todas' ? null : value)}
+                                    >
+                                        <Select.Option value="Todas">Todas</Select.Option>
+                                        {categories.map((cat) => (
+                                            <Select.Option key={cat} value={cat}>
+                                                {cat}
+                                            </Select.Option>
+                                        ))}
+                                    </Select>
                                 </Col>
-                                <Col xs={24} sm={12} md={6}>
-                                    <div>
-                                        <Text type="secondary" style={{fontSize: 12}}>Categoría</Text>
-                                        <Select
-                                            placeholder="Todas"
-                                            style={{ width: '100%', marginTop: 4 }}
-                                            value={category || 'Todas'}
-                                            onChange={(value) => setCategory(value === 'Todas' ? null : value)}
-                                        >
-                                            <Select.Option value="Todas">Todas</Select.Option>
-                                            {categories.map((cat) => (
-                                                <Select.Option key={cat} value={cat}>
-                                                    {cat}
-                                                </Select.Option>
-                                            ))}
-                                        </Select>
-                                    </div>
-                                </Col>
-                                <Col xs={24} sm={12} md={12}>
-                                    <div>
-                                        <Text type="secondary" style={{fontSize: 12}}>
-                                            Rango de Precio: {currencyFormatter(priceRange[0])} - {currencyFormatter(priceRange[1])}
-                                        </Text>
-                                        <Slider
-                                            range
-                                            min={0}
-                                            step={5000}
-                                            max={100000}
-                                            value={priceRange}
-                                            onChange={(v) => setPriceRange(v as [number, number])}
-                                            tooltip={{formatter: currencyFormatter}}
-                                            marks={{
-                                                0: '$0',
-                                                100000: '$100k',
-                                            }}
-                                            style={{marginTop: 8}}
-                                        />
-                                    </div>
+                                <Col xs={24} md={16} lg={18}>
+                                    <Text type="secondary" style={{fontSize: 12}}>
+                                        Rango de Precio: {currencyFormatter(activePriceRange[0])} - {currencyFormatter(activePriceRange[1])}
+                                    </Text>
+                                    <Slider
+                                        range
+                                        min={priceBounds[0]}
+                                        max={priceBounds[1]}
+                                        step={Math.max(1, Math.round((priceBounds[1] - priceBounds[0]) / 20))}
+                                        value={activePriceRange}
+                                        onChange={(v) => setPriceRange(v as [number, number])}
+                                        tooltip={{formatter: currencyFormatter}}
+                                        marks={{
+                                            [priceBounds[0]]: currencyFormatter(priceBounds[0]),
+                                            [priceBounds[1]]: currencyFormatter(priceBounds[1]),
+                                        }}
+                                        style={{marginTop: 12}}
+                                    />
                                 </Col>
                             </Row>
                         </div>
                     ) : (
-                        // MOBILE FILTERS BUTTON
-                        <Button
-                            icon={<FilterOutlined />}
-                            block
-                            size="large"
-                            onClick={() => setShowMobileFilters(true)}
-                            style={{
-                                borderColor: '#5ea18b',
-                                color: '#5ea18b',
-                                height: 44,
-                                fontSize: 14,
-                                fontWeight: 500
-                            }}
-                        >
-                            Filtros
-                        </Button>
+                        // MOBILE FILTERS BUTTON + ACTIVE FILTER SUMMARY
+                        <>
+                            <Badge count={activeFilterCount} size="small" offset={[-8, 8]}>
+                                <Button
+                                    icon={<FilterOutlined />}
+                                    block
+                                    size="large"
+                                    onClick={() => setShowMobileFilters(true)}
+                                    style={{
+                                        borderColor: '#5ea18b',
+                                        color: '#5ea18b',
+                                        height: 44,
+                                        fontSize: 14,
+                                        fontWeight: 500
+                                    }}
+                                >
+                                    Filtros
+                                </Button>
+                            </Badge>
+
+                            {activeFilterCount > 0 && (
+                                <Space size={[8, 8]} wrap style={{marginTop: 12}}>
+                                    {category && (
+                                        <Tag
+                                            closable
+                                            closeIcon={<CloseOutlined style={{fontSize: 10}} />}
+                                            onClose={() => setCategory(null)}
+                                            color="#5ea18b"
+                                        >
+                                            {category}
+                                        </Tag>
+                                    )}
+                                    {isPriceFiltered && (
+                                        <Tag
+                                            closable
+                                            closeIcon={<CloseOutlined style={{fontSize: 10}} />}
+                                            onClose={() => setPriceRange(null)}
+                                            color="#5ea18b"
+                                        >
+                                            {currencyFormatter(activePriceRange[0])} - {currencyFormatter(activePriceRange[1])}
+                                        </Tag>
+                                    )}
+                                </Space>
+                            )}
+                        </>
                     )}
                 </section>
 

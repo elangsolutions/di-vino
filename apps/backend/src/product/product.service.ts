@@ -29,6 +29,10 @@ export class ProductService {
     return this.model.findOne({_id});
   }
 
+  async countProductsWithCategory(category: string): Promise<number> {
+    return this.model.countDocuments({ category });
+  }
+
   async delete(input: RemoveProductInput) {
 
     if(await this.ensureDelete(input)) {

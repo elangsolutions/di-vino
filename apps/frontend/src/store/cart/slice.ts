@@ -19,7 +19,11 @@ const slice = createSlice({
         decrement: (state, action: PayloadAction<{ productId: string }>) => {
             const id = action.payload.productId;
             const current = state.quantities[id] || 0;
-            state.quantities[id] = current > 0 ? current - 1 : 0;
+            if (current <= 1) {
+                delete state.quantities[id];
+            } else {
+                state.quantities[id] = current - 1;
+            }
         },
         remove: (state, action: PayloadAction<{ productId: string }>) => {
             const id = action.payload.productId;
@@ -31,7 +35,15 @@ const slice = createSlice({
 export const { increment, decrement, remove } = slice.actions;
 export default slice.reducer;
 
-export const getCartItemsCount = (state: any) => Object.keys(state.cart.quantities)?.length || 0;
+// Counts distinct products actually in the cart (quantity > 0), not stale/zeroed keys.
+export const getCartItemsCount = (state: any) =>
+    Object.values(state.cart.quantities as Record<string, number>).filter((qty) => qty > 0).length;
+
+export const getCartUnitsCount = (state: any) =>
+    Object.values(state.cart.quantities as Record<string, number>).reduce(
+        (sum: number, qty) => sum + (qty as number),
+        0
+    );
 
 export const selectCartItems = (state: any) => {
     const quantities = state.cart.quantities;

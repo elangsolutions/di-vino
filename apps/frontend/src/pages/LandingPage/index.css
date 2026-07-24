@@ -7,20 +7,9 @@
     padding-bottom: 30px;
 }
 
-/* Mobile-first responsive styles */
+/* Header/content padding is controlled inline (see LandingPage isMobile logic)
+   to keep a single source of truth for the mobile breakpoint. */
 @media (max-width: 768px) {
-    .ant-layout-header {
-        padding: 12px 16px !important;
-    }
-
-    .ant-layout-content {
-        padding: 16px !important;
-    }
-
-    .ant-title {
-        font-size: 18px !important;
-    }
-
     .filter-section {
         margin-bottom: 20px;
     }
@@ -30,18 +19,14 @@
     .ant-row {
         width: 100%;
     }
+
+    /* Center the quantity +/- controls on product cards */
+    .product-card-actions {
+        justify-content: center;
+    }
 }
 
-/* Desktop styles */
 @media (min-width: 769px) {
-    .ant-layout-header {
-        padding: 16px 24px !important;
-    }
-
-    .ant-layout-content {
-        padding: 24px !important;
-    }
-
     .filter-section {
         margin-bottom: 32px;
     }

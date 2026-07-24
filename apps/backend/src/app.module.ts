@@ -11,6 +11,7 @@ import {join} from 'path';
 import {ConfigModule} from './config/config.module';
 import {OrderModule} from "./order/order.module";
 import {ProductModule} from "./product/product.module";
+import {CategoryModule} from "./category/category.module";
 import {PaymentModule} from "./integrations/payment/payment.module";
 import * as process from "node:process";
 
@@ -39,6 +40,7 @@ import * as process from "node:process";
     AuthModule,
     OrderModule,
     ProductModule,
+    CategoryModule,
     PaymentModule
   ],
   providers: [AppService],

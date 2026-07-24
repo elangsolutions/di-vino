@@ -9,6 +9,12 @@ input AddAddressInput {
   street: String!
 }
 
+input AddCategoryInput {
+  _id: String
+  description: String
+  name: String!
+}
+
 input AddProductInput {
   _id: String
   category: String!
@@ -23,6 +29,12 @@ type Address {
   postalCode: String!
   province: String!
   street: String!
+}
+
+type Category {
+  _id: ID!
+  description: String
+  name: String!
 }
 
 input CreateOrderDraftInput {
@@ -60,9 +72,11 @@ input LoginInput {
 }
 
 type Mutation {
+  addCategory(input: AddCategoryInput!): Category!
   addProduct(input: AddProductInput!): Product!
   createOrder(input: CreateOrderDraftInput!): Order!
   createPaymentPreference(amount: Float!, description: String!, orderId: String!): PaymentPreference!
+  deleteCategory(input: RemoveCategoryInput!): Category
   deleteProduct(input: RemoveProductInput!): Product!
   login(input: LoginInput!): String!
   register(input: RegisterInput!): String!
@@ -124,6 +138,8 @@ type Product {
 }
 
 type Query {
+  categories: [Category!]!
+  category(id: String!): Category!
   orders: [Order!]!
   product(id: String!): Product!
   products: [Product!]!
@@ -132,6 +148,10 @@ type Query {
 input RegisterInput {
   email: String!
   password: String!
+}
+
+input RemoveCategoryInput {
+  _id: String
 }
 
 input RemoveProductInput {

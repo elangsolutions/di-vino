@@ -1,8 +1,10 @@
 import {useState} from 'react';
-import {Button, message, Steps} from 'antd';
+import {Button, Result, Steps, Tooltip} from 'antd';
+import {CheckCircleFilled} from '@ant-design/icons';
 import CartList from "./CartList";
 import {useDispatch, useSelector} from "react-redux";
 import {decrement, getCartItemsCount, increment, remove} from "../../store/cart/slice.ts";
+import {selectIsDeliveryValid} from "../../store/delivery/slice.ts";
 import CartDelivery from "./CartDelivery";
 import {useNavigate} from "react-router-dom";
 import CartPayment from "./CartPayment";
@@ -11,7 +13,8 @@ const CartPage = () => {
     const navigate = useNavigate();
     const [current, setCurrent] = useState(0);
     const dispatch = useDispatch()
-    const cartItemsCount  = useSelector(getCartItemsCount);
+    const cartItemsCount = useSelector(getCartItemsCount);
+    const isDeliveryValid = useSelector(selectIsDeliveryValid);
 
     const handleIncrement = (productId:string) => {
         dispatch(increment({ productId: productId }));
@@ -24,34 +27,56 @@ const CartPage = () => {
         dispatch(remove({ productId: productId }));
     }
 
-
     const steps = [
         {
-            title: 'Lista de pedidos',
+            title: 'Pedido',
             content: <CartList onIncrease={handleIncrement} onDecrease={handleDecrease} onRemove =  {handleRemove} />,
+            canProceed: cartItemsCount > 0,
+            blockedMessage: 'Agregá al menos un producto para continuar.',
+            nextLabel: 'Siguiente',
         },
         {
-            title: 'Direccion de Entrega/PickUp',
+            title: 'Entrega',
             content: <CartDelivery />,
+            canProceed: isDeliveryValid,
+            blockedMessage: 'Completá los datos de entrega para continuar.',
+            nextLabel: 'Siguiente',
         },
         {
-            title: 'Resumen-confirmacion',
+            title: 'Pago',
             content: <CartPayment />,
+            canProceed: true,
+            blockedMessage: '',
+            nextLabel: 'Confirmar pedido',
         },
         {
-            title: 'En Proceso',
-                content: 'Su pedido está en Camino'
+            title: 'Listo',
+            content: (
+                <Result
+                    icon={<CheckCircleFilled style={{color: '#5ea18b'}} />}
+                    status="success"
+                    title="¡Tu pedido está en camino!"
+                    subTitle="Te vamos a avisar por WhatsApp o email cuando esté listo para retirar."
+                />
+            ),
+            canProceed: false,
+            blockedMessage: '',
+            nextLabel: '',
         }
     ];
 
+    const isLastStep = current === steps.length - 1;
+    const activeStep = steps[current];
 
     const next = () => {
+        if (!activeStep.canProceed) return;
         setCurrent(current + 1);
     };
 
     const prev = () => {
-        if(current ===0){
+        if(current === 0){
             navigate("/")
+            return;
         }
         setCurrent(current - 1);
     };
@@ -59,31 +84,51 @@ const CartPage = () => {
     const items = steps.map((item) => ({ key: item.title, title: item.title }));
 
     return (
-        <div style={{height: '100%', padding:'20px'}}>
-            <Steps current={current} items={items} />
-            <div style={{paddingTop:'30px'}}>{steps[current].content}</div>
-            <div style={{ paddingTop: '20px' }}>
-                {current > 0 && (
-                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-                        Atras
+        <div style={{height: '100%', padding: '16px', paddingBottom: 96}}>
+            <Steps current={current} items={items} size="small" responsive />
+            <div style={{paddingTop: '24px'}}>{activeStep.content}</div>
+
+            {!isLastStep && (
+                <div
+                    style={{
+                        position: 'sticky',
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                        padding: '16px 0',
+                        marginTop: 24,
+                        background: '#fff',
+                        borderTop: '1px solid #f0f0f0',
+                    }}
+                >
+                    <div style={{display: 'flex', gap: 12, maxWidth: 480, margin: '0 auto'}}>
+                        <Button style={{flex: 1, height: 44}} onClick={prev}>
+                            {current === 0 ? 'Volver' : 'Atrás'}
+                        </Button>
+                        <Tooltip title={activeStep.canProceed ? '' : activeStep.blockedMessage}>
+                            <span style={{flex: 1}}>
+                                <Button
+                                    type="primary"
+                                    block
+                                    style={{height: 44}}
+                                    disabled={!activeStep.canProceed}
+                                    onClick={next}
+                                >
+                                    {activeStep.nextLabel}
+                                </Button>
+                            </span>
+                        </Tooltip>
+                    </div>
+                </div>
+            )}
+
+            {isLastStep && (
+                <div style={{paddingTop: 24, textAlign: 'center'}}>
+                    <Button type="primary" size="large" onClick={() => navigate('/')}>
+                        Volver al inicio
                     </Button>
-                )}
-                {current === 0 && (
-                    <Button style={{ margin: '0 8px' }} onClick={() => prev()}>
-                        Volver
-                    </Button>
-                )}
-                {current < steps.length - 1 && cartItemsCount > 0 && (
-                    <Button type="primary" onClick={() => next()}>
-                        Siguiente
-                    </Button>
-                )}
-                {current === steps.length - 1 && (
-                    <Button type="primary" onClick={() => message.success('Processing complete!')}>
-                        Comprar
-                    </Button>
-                )}
-            </div>
+                </div>
+            )}
         </div>
     );
 };

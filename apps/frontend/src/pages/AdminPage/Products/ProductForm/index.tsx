@@ -2,6 +2,7 @@ import {Button, Form, Input, InputNumber, Select, Space} from "antd";
 import {useForm, Controller} from "react-hook-form";
 import {useMutation, useQuery} from "@apollo/client";
 import {ADD_PRODUCT, GET_PRODUCT} from "../../../../components/Product/queries.ts";
+import {GET_CATEGORIES} from "../../../../components/Category/queries";
 import {useEffect, useState} from "react";
 import {useNotify} from "../../../../context/NotificationContext";
 import {useNavigate} from "react-router-dom";
@@ -22,8 +23,10 @@ const ProductForm = ({productId}: { productId?: string }) => {
     const {notifySuccess, notifyError} = useNotify();
     const {data, loading: loadingGet} = useQuery(GET_PRODUCT, {
         variables: {id: productId},
-        skip: !productId,
+        skip: !productId || productId === 'new',
     });
+    const {data: categoriesData} = useQuery(GET_CATEGORIES);
+    const categories = categoriesData?.categories || [];
 
 
     useEffect(() => {
@@ -87,10 +90,11 @@ const ProductForm = ({productId}: { productId?: string }) => {
                     rules={{required: "Requerido"}}
                     render={({field}) => (
                         <Select {...field} placeholder="Selecciona una categoría" allowClear>
-                            <Select.Option value="Vinos">Vinos</Select.Option>
-                            <Select.Option value="Cervezas">Cervezas</Select.Option>
-                            <Select.Option value="Quesos">Quesos</Select.Option>
-                            <Select.Option value="Promos">Promos</Select.Option>
+                            {categories.map((cat: {_id: string; name: string}) => (
+                                <Select.Option key={cat._id} value={cat.name}>
+                                    {cat.name}
+                                </Select.Option>
+                            ))}
                         </Select>
                     )}
                 />

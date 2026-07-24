@@ -11,6 +11,8 @@ import ProductForm from "./pages/AdminPage/Products/ProductForm";
 import {Provider} from 'react-redux';
 import {store} from './store/store';
 import ProductListPage from "./pages/AdminPage/Products/ProductList";
+import CategoryListPage from "./pages/AdminPage/Categories/CategoryList";
+import CategoryForm from "./pages/AdminPage/Categories/CategoryForm";
 import CartPage from "./pages/CartPage";
 
 
@@ -53,6 +55,19 @@ const App = () => {
                                             <InstanceFormPage
                                                 entityName="producto"
                                                 renderForm={(id) => <ProductForm productId={id}/>}
+                                            />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route path="categories" element={<CategoryListPage/>}/>
+                                <Route
+                                    path="/admin/categories/:id"
+                                    element={
+                                        <PrivateRoute>
+                                            <InstanceFormPage
+                                                entityName="categoría"
+                                                renderForm={(id) => <CategoryForm categoryId={id}/>}
                                             />
                                         </PrivateRoute>
                                     }

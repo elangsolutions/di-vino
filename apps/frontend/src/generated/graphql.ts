@@ -25,6 +25,12 @@ export type AddAddressInput = {
   street: Scalars['String']['input'];
 };
 
+export type AddCategoryInput = {
+  _id?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+};
+
 export type AddProductInput = {
   _id?: InputMaybe<Scalars['String']['input']>;
   category: Scalars['String']['input'];
@@ -40,6 +46,13 @@ export type Address = {
   postalCode: Scalars['String']['output'];
   province: Scalars['String']['output'];
   street: Scalars['String']['output'];
+};
+
+export type Category = {
+  __typename?: 'Category';
+  _id: Scalars['ID']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
 };
 
 export type CreateOrderDraftInput = {
@@ -74,12 +87,19 @@ export type LoginInput = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addCategory: Category;
   addProduct: Product;
   createOrder: Order;
   createPaymentPreference: PaymentPreference;
+  deleteCategory?: Maybe<Category>;
   deleteProduct: Product;
   login: Scalars['String']['output'];
   register: Scalars['String']['output'];
+};
+
+
+export type MutationAddCategoryArgs = {
+  input: AddCategoryInput;
 };
 
 
@@ -97,6 +117,11 @@ export type MutationCreatePaymentPreferenceArgs = {
   amount: Scalars['Float']['input'];
   description: Scalars['String']['input'];
   orderId: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteCategoryArgs = {
+  input: RemoveCategoryInput;
 };
 
 
@@ -175,9 +200,16 @@ export type Product = {
 
 export type Query = {
   __typename?: 'Query';
+  categories: Array<Category>;
+  category: Category;
   orders: Array<Order>;
   product: Product;
   products: Array<Product>;
+};
+
+
+export type QueryCategoryArgs = {
+  id: Scalars['String']['input'];
 };
 
 
@@ -188,6 +220,10 @@ export type QueryProductArgs = {
 export type RegisterInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+export type RemoveCategoryInput = {
+  _id?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type RemoveProductInput = {
@@ -266,9 +302,11 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   AddAddressInput: AddAddressInput;
+  AddCategoryInput: AddCategoryInput;
   AddProductInput: AddProductInput;
   Address: ResolverTypeWrapper<Address>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  Category: ResolverTypeWrapper<Category>;
   CreateOrderDraftInput: CreateOrderDraftInput;
   DateTime: ResolverTypeWrapper<Scalars['DateTime']['output']>;
   Delivery: ResolverTypeWrapper<Delivery>;
@@ -286,6 +324,7 @@ export type ResolversTypes = {
   Product: ResolverTypeWrapper<Product>;
   Query: ResolverTypeWrapper<{}>;
   RegisterInput: RegisterInput;
+  RemoveCategoryInput: RemoveCategoryInput;
   RemoveProductInput: RemoveProductInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 };
@@ -293,9 +332,11 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   AddAddressInput: AddAddressInput;
+  AddCategoryInput: AddCategoryInput;
   AddProductInput: AddProductInput;
   Address: Address;
   Boolean: Scalars['Boolean']['output'];
+  Category: Category;
   CreateOrderDraftInput: CreateOrderDraftInput;
   DateTime: Scalars['DateTime']['output'];
   Delivery: Delivery;
@@ -311,6 +352,7 @@ export type ResolversParentTypes = {
   Product: Product;
   Query: {};
   RegisterInput: RegisterInput;
+  RemoveCategoryInput: RemoveCategoryInput;
   RemoveProductInput: RemoveProductInput;
   String: Scalars['String']['output'];
 };
@@ -320,6 +362,13 @@ export type AddressResolvers<ContextType = any, ParentType extends ResolversPare
   postalCode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   province?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   street?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type CategoryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Category'] = ResolversParentTypes['Category']> = {
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -335,9 +384,11 @@ export type DeliveryResolvers<ContextType = any, ParentType extends ResolversPar
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addCategory?: Resolver<ResolversTypes['Category'], ParentType, ContextType, RequireFields<MutationAddCategoryArgs, 'input'>>;
   addProduct?: Resolver<ResolversTypes['Product'], ParentType, ContextType, RequireFields<MutationAddProductArgs, 'input'>>;
   createOrder?: Resolver<ResolversTypes['Order'], ParentType, ContextType, RequireFields<MutationCreateOrderArgs, 'input'>>;
   createPaymentPreference?: Resolver<ResolversTypes['PaymentPreference'], ParentType, ContextType, RequireFields<MutationCreatePaymentPreferenceArgs, 'amount' | 'description' | 'orderId'>>;
+  deleteCategory?: Resolver<Maybe<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<MutationDeleteCategoryArgs, 'input'>>;
   deleteProduct?: Resolver<ResolversTypes['Product'], ParentType, ContextType, RequireFields<MutationDeleteProductArgs, 'input'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
   register?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'input'>>;
@@ -388,6 +439,8 @@ export type ProductResolvers<ContextType = any, ParentType extends ResolversPare
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  categories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType>;
+  category?: Resolver<ResolversTypes['Category'], ParentType, ContextType, RequireFields<QueryCategoryArgs, 'id'>>;
   orders?: Resolver<Array<ResolversTypes['Order']>, ParentType, ContextType>;
   product?: Resolver<ResolversTypes['Product'], ParentType, ContextType, RequireFields<QueryProductArgs, 'id'>>;
   products?: Resolver<Array<ResolversTypes['Product']>, ParentType, ContextType>;
@@ -395,6 +448,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type Resolvers<ContextType = any> = {
   Address?: AddressResolvers<ContextType>;
+  Category?: CategoryResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   Delivery?: DeliveryResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;

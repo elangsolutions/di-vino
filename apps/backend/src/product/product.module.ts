@@ -13,5 +13,6 @@ import {OrderModule} from "../order/order.module";
         OrderModule,
     ],
     providers: [ProductResolver, ProductService],
+    exports: [ProductService],
 })
 export class ProductModule {}

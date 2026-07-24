@@ -33,8 +33,16 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
     return <Col xs={24} sm={12} md={8} lg={6} key={product._id}>
         <Card onClick={open}
               hoverable
-              cover={<img alt={product.name} src={product.image || NO_IMAGE}/>}
-              style={{minWidth: '200px', maxWidth: '400px', height: '500px', maxHeight: '500px'}}
+              cover={
+                  <div style={{width: '100%', aspectRatio: '4 / 3', overflow: 'hidden'}}>
+                      <img
+                          alt={product.name}
+                          src={product.image || NO_IMAGE}
+                          style={{width: '100%', height: '100%', objectFit: 'cover'}}
+                      />
+                  </div>
+              }
+              style={{minWidth: '200px', maxWidth: '400px'}}
         >
             <Card.Meta
                 title={product.name}
@@ -55,14 +63,15 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
                     </>
                 }
             />
-            <Space style={{marginTop: 12}}>
+            <Space className="product-card-actions" style={{marginTop: 12, display: 'flex', width: '100%'}}>
                 <Button
+                    size="large"
                     icon={<MinusOutlined/>}
                     onClick={handleDecrement}
                     disabled={quantity === 0}
                 />
-                <span>{quantity}</span>
-                <Button type={'primary'} icon={<PlusOutlined/>} onClick={handleIncrement}/>
+                <span style={{minWidth: 20, textAlign: 'center', display: 'inline-block'}}>{quantity}</span>
+                <Button size="large" type={'primary'} icon={<PlusOutlined/>} onClick={handleIncrement}/>
             </Space>
         </Card>
         <ProductCardModal isOpen={isOpen} close={close} product={product}/>
