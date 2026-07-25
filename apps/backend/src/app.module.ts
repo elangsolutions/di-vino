@@ -25,7 +25,14 @@ import * as process from "node:process";
     GraphQLModule.forRoot({
       driver: ApolloDriver,
       debug: true,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      // In production (e.g. the Docker/Railway image) only `dist/` exists, so there is no
+      // `src/` directory to write the generated schema into. Build the schema in-memory
+      // instead; locally, keep writing to `src/schema.gql` so it can be committed via
+      // the `schema:commit` script.
+      autoSchemaFile:
+        process.env.NODE_ENV === 'production'
+          ? true
+          : join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       playground: true,
       introspection: true,
