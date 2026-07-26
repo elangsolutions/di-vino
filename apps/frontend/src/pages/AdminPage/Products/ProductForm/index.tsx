@@ -1,4 +1,4 @@
-import {Button, Form, Input, InputNumber, Select, Space} from "antd";
+import {Button, Form, Input, Select, Space} from "antd";
 import {useForm, Controller} from "react-hook-form";
 import {useMutation, useQuery} from "@apollo/client";
 import {ADD_PRODUCT, GET_PRODUCT} from "../../../../components/Product/queries.ts";
@@ -11,7 +11,6 @@ interface ProductFormData {
     name: string;
     details: string;
     category: string;
-    price: number;
     image?: string;
 }
 
@@ -35,9 +34,11 @@ const ProductForm = ({productId}: { productId?: string }) => {
                 name: data.product.name,
                 details: data.product.details,
                 category: data.product.category,
-                price: data.product.price,
                 image: data.product.image,
             });
+            if (data.product.image) {
+                setImagePreview(data.product.image);
+            }
         }
     }, [data, reset]);
     if (loading || loadingGet) return <p>Cargando...</p>;
@@ -51,7 +52,6 @@ const ProductForm = ({productId}: { productId?: string }) => {
                         name: formData.name,
                         details: formData.details,
                         category: formData.category,
-                        price: formData.price,
                         image: formData.image || null,
                     },
                 },
@@ -96,23 +96,6 @@ const ProductForm = ({productId}: { productId?: string }) => {
                                 </Select.Option>
                             ))}
                         </Select>
-                    )}
-                />
-            </Form.Item>
-
-            <Form.Item label="Precio" required>
-                <Controller
-                    name="price"
-                    control={control}
-                    rules={{required: "Requerido", min: 0}}
-                    render={({field}) => (
-                        <InputNumber
-                            {...field}
-                            min={0}
-                            style={{width: "100%"}}
-                            formatter={(value) => `$ ${value}`}
-                            parser={(value) => parseFloat(value?.replace(/\$\s?|(,*)/g, "") || "0")}
-                        />
                     )}
                 />
             </Form.Item>

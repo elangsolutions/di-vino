@@ -36,9 +36,11 @@ const ProductCardModal = ({ isOpen, close, product }: ProductCardModalProps) => 
                 <Title level={4} style={{ margin: '4px 0 0' }}>
                     {product.name}
                 </Title>
-                <Text strong style={{ fontSize: 18, color: '#5ea18b' }}>
-                    ${priceFormat(product.activeItemPrice?.price ?? product.price)}.-
-                </Text>
+                {product.activeItemPrice && (
+                    <Text strong style={{ fontSize: 18, color: '#5ea18b' }}>
+                        ${priceFormat(product.activeItemPrice.price)}.-
+                    </Text>
+                )}
                 {product.details && (
                     <p className="product-modal-details">{product.details}</p>
                 )}

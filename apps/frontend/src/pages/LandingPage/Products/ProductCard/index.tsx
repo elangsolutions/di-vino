@@ -48,7 +48,9 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
                 description={
                     <>
                         <div style={{fontWeight: 'bold'}}>
-                            ${priceFormat(product.activeItemPrice?.price ?? product.price)}.-
+                            {product.activeItemPrice
+                                ? `$${priceFormat(product.activeItemPrice.price)}.-`
+                                : null}
                         </div>
                         <div
                             style={{

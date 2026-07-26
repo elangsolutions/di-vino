@@ -15,8 +15,8 @@ export class AddProductInput {
     @Field()
     category: string;
 
-    @Field(() => Float)
-    price: number;
+    @Field(() => Float, { nullable: true })
+    price?: number;
 
     @Field({ nullable: true })
     image?: string;

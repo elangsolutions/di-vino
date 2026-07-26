@@ -6,9 +6,15 @@ export const GET_PRODUCTS = gql`
       _id
       name
       details
-      price
       category
       image
+      activeItemPrice {
+        _id
+        price
+        stock
+        fromDate
+        toDate
+      }
     }
   }
 `;

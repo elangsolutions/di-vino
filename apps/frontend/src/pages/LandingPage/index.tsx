@@ -62,7 +62,10 @@ const LandingPage: FC = () => {
 
     const priceBounds = useMemo<[number, number]>(() => {
         if (!products.length) return [0, 100000];
-        const prices = products.map((p: Product) => p.price);
+        const prices = products
+            .map((p: Product) => p.activeItemPrice?.price)
+            .filter((price): price is number => price != null);
+        if (!prices.length) return [0, 100000];
         return [Math.min(...prices), Math.max(...prices)];
     }, [products]);
 
@@ -78,17 +81,18 @@ const LandingPage: FC = () => {
 
     const filteredProducts = useMemo(() => {
         return products.filter((p: Product) => {
-            let pass = true;
+            const itemPrice = p.activeItemPrice?.price;
+            if (itemPrice == null) return false;
 
             if (category && p.category !== category) {
-                pass = false;
+                return false;
             }
 
-            if (p.price < activePriceRange[0] || p.price > activePriceRange[1]) {
-                pass = false;
+            if (itemPrice < activePriceRange[0] || itemPrice > activePriceRange[1]) {
+                return false;
             }
 
-            return pass;
+            return true;
         });
     }, [products, category, activePriceRange]);
 

@@ -20,7 +20,7 @@ export class Product extends Document {
     deprecationReason:
       'Use ItemPrice instead (supports scheduled/promotional pricing windows by date range).',
   })
-  @Prop()
+  @Prop({ default: 0 })
   price: number;
 
   @Field()

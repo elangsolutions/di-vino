@@ -12,10 +12,14 @@ export class ProductService {
               private readonly orderService: OrderService) {}
 
   async create(input: AddProductInput) {
+    const payload = {
+      ...input,
+      price: input.price ?? 0,
+    };
 
     return this.model.findOneAndUpdate(
         { _id: new Types.ObjectId(input._id) },
-        { $set: input },
+        { $set: payload },
         { upsert: true, new: true },
     );
 

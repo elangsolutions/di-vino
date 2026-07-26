@@ -31,7 +31,7 @@ input AddProductInput {
   details: String!
   image: String
   name: String!
-  price: Float!
+  price: Float
 }
 
 type Address {

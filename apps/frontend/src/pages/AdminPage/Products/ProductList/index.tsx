@@ -69,7 +69,12 @@ const ProductListPage = () => {
                             }
                         >
                             <div>
-                                <p>Precio: ${priceFormat(product.price)}</p>
+                                <p>
+                                    Precio vigente:{' '}
+                                    {product.activeItemPrice
+                                        ? `$${priceFormat(product.activeItemPrice.price)}`
+                                        : 'Sin precio vigente'}
+                                </p>
                                 <p>Categoria: {product.category}</p>
 
                                 <p>{product.details}</p>
