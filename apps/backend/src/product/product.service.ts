@@ -25,6 +25,15 @@ export class ProductService {
     return this.model.find();
   }
 
+  async findByIds(ids: string[]) {
+    if (!ids.length) {
+      return [];
+    }
+    return this.model.find({
+      _id: { $in: ids.map((id) => new Types.ObjectId(id)) },
+    });
+  }
+
   async findOne(_id: string) {
     return this.model.findOne({_id});
   }

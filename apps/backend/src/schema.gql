@@ -15,6 +15,16 @@ input AddCategoryInput {
   name: String!
 }
 
+input AddItemPriceInput {
+  _id: String
+  fromDate: DateTime!
+  price: Float!
+  productId: String!
+  promotionCodes: [String!]
+  stock: Int!
+  toDate: DateTime!
+}
+
 input AddProductInput {
   _id: String
   category: String!
@@ -66,6 +76,18 @@ enum DeliveryType {
   PICKUP
 }
 
+type ItemPrice {
+  _id: ID!
+  createdAt: DateTime!
+  fromDate: DateTime!
+  price: Float!
+  productId: String!
+  promotionCodes: [String!]
+  stock: Int!
+  toDate: DateTime!
+  updatedAt: DateTime!
+}
+
 input LoginInput {
   email: String!
   password: String!
@@ -73,10 +95,12 @@ input LoginInput {
 
 type Mutation {
   addCategory(input: AddCategoryInput!): Category!
+  addItemPrice(input: AddItemPriceInput!): ItemPrice!
   addProduct(input: AddProductInput!): Product!
   createOrder(input: CreateOrderDraftInput!): Order!
   createPaymentPreference(amount: Float!, description: String!, orderId: String!): PaymentPreference!
   deleteCategory(input: RemoveCategoryInput!): Category
+  deleteItemPrice(input: RemoveItemPriceInput!): ItemPrice
   deleteProduct(input: RemoveProductInput!): Product!
   login(input: LoginInput!): String!
   register(input: RegisterInput!): String!
@@ -129,17 +153,23 @@ type PaymentPreference {
 
 type Product {
   _id: ID!
+  activeItemPrice: ItemPrice
   category: String!
   details: String
   image: String
   name: String!
-  price: Float!
+  price: Float! @deprecated(reason: "Use ItemPrice instead (supports scheduled/promotional pricing windows by date range).")
   stock: Float!
 }
 
 type Query {
+  activeItemPrice(at: DateTime, productId: String!): ItemPrice
+  availableProducts(at: DateTime): [Product!]!
   categories: [Category!]!
   category(id: String!): Category!
+  itemPrice(id: String!): ItemPrice
+  itemPrices: [ItemPrice!]!
+  itemPricesByProduct(productId: String!): [ItemPrice!]!
   orders: [Order!]!
   product(id: String!): Product!
   products: [Product!]!
@@ -151,7 +181,11 @@ input RegisterInput {
 }
 
 input RemoveCategoryInput {
-  _id: String
+  _id: String!
+}
+
+input RemoveItemPriceInput {
+  _id: String!
 }
 
 input RemoveProductInput {

@@ -1,18 +1,25 @@
 import { createContext, useContext } from "react";
-import { notification } from "antd";
+import { App } from "antd";
 
-export const NotificationContext = createContext({
-    notifySuccess: (_message: string, _description?: string) => {},
-    notifyError: (_message: string, _description?: string) => {},
+type NotifyFn = (message: string, description?: string) => void;
+
+export const NotificationContext = createContext<{
+    notifySuccess: NotifyFn;
+    notifyError: NotifyFn;
+}>({
+    notifySuccess: () => {},
+    notifyError: () => {},
 });
 
 export const NotificationProvider = ({ children }: { children: React.ReactNode }) => {
-    const notifySuccess = (message: string, description?: string) => {
-        notification.success({ message, description });
+    const { notification } = App.useApp();
+
+    const notifySuccess: NotifyFn = (message, description) => {
+        notification.success({ message, description, placement: "topRight" });
     };
 
-    const notifyError = (message: string, description?: string) => {
-        notification.error({ message, description });
+    const notifyError: NotifyFn = (message, description) => {
+        notification.error({ message, description, placement: "topRight" });
     };
 
     return (

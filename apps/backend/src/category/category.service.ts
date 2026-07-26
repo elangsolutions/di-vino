@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Category } from './category.schema';
 import { Model, Types } from 'mongoose';
@@ -28,20 +28,23 @@ export class CategoryService {
   }
 
   async delete(input: RemoveCategoryInput) {
-    const category = await this.model.findOne({ _id: input._id });
+    if (!input._id || !Types.ObjectId.isValid(input._id)) {
+      throw new BadRequestException('ID de categoría inválido.');
+    }
+
+    const categoryId = new Types.ObjectId(input._id);
+    const category = await this.model.findById(categoryId);
     if (!category) {
-      return null;
+      throw new NotFoundException('Categoría no encontrada.');
     }
 
-    await this.ensureDelete(category.name);
-
-    return this.model.findOneAndDelete({ _id: new Types.ObjectId(input._id) });
-  }
-
-  async ensureDelete(categoryName: string) {
-    if (await this.productService.countProductsWithCategory(categoryName)) {
-      throw new Error('Category cannot be deleted, Products were found using this category.');
+    const productCount = await this.productService.countProductsWithCategory(category.name);
+    if (productCount > 0) {
+      throw new BadRequestException(
+        `No se puede eliminar la categoría "${category.name}" porque tiene ${productCount} producto(s) asociado(s).`,
+      );
     }
-    return true;
+
+    return this.model.findByIdAndDelete(categoryId);
   }
 }

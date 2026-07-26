@@ -3,7 +3,7 @@ import {Alert, Badge, Col, Layout, Row, Spin, Typography, Select, Slider, Button
 import {FilterOutlined, ShoppingCartOutlined, CloseOutlined} from '@ant-design/icons';
 import './index.css';
 import ProductCard from "./Products/ProductCard";
-import {useGetProducts} from "../../components/Product/hooks/useGetProducts.ts";
+import {useGetAvailableProducts} from "../../components/Product/hooks/useGetAvailableProducts.ts";
 import {Product} from "../../generated/graphql.ts";
 import {useNavigate} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
@@ -23,7 +23,7 @@ const currencyFormatter = (val?: number) => {
 };
 
 const LandingPage: FC = () => {
-    const {products, loading, error} = useGetProducts();
+    const {products, loading, error} = useGetAvailableProducts();
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const totalItems = useSelector(getCartUnitsCount);
@@ -173,7 +173,7 @@ const LandingPage: FC = () => {
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
             }}>
                 <Title level={1} style={{margin: 0, fontSize: isMobile ? 18 : 34}}>
-                    Di-Vino
+                    Di Vino
                 </Title>
 
                 {!isMobile && (
@@ -364,7 +364,7 @@ const LandingPage: FC = () => {
             </Drawer>
 
             <Footer style={{textAlign: 'center', paddingTop: 32}}>
-                © {new Date().getFullYear()} Di-Vino - Todos los derechos reservados
+                © {new Date().getFullYear()} Di Vino - Todos los derechos reservados
             </Footer>
         </>
     );

@@ -4,11 +4,10 @@ import {JSX} from "react";
 import {useDisclosure} from "../../../../components/hooks/useDisclosure.tsx";
 import ProductCardModal from "../ProductCardModal";
 import {Product} from "../../../../generated/graphql.ts";
-import NO_IMAGE from "../../../../assets/place_holder.png";
 import { RootState } from "../../../../store/store";
 import {useDispatch, useSelector} from "react-redux";
 import {decrement, increment} from "../../../../store/cart/slice.ts";
-import {priceFormat} from "../../../../utils";
+import {getProductImage, priceFormat} from "../../../../utils";
 
 type ProductCardProps = {
     product: Product
@@ -37,7 +36,7 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
                   <div style={{width: '100%', aspectRatio: '4 / 3', overflow: 'hidden'}}>
                       <img
                           alt={product.name}
-                          src={product.image || NO_IMAGE}
+                          src={getProductImage(product.image, product.category)}
                           style={{width: '100%', height: '100%', objectFit: 'cover'}}
                       />
                   </div>
@@ -48,7 +47,9 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
                 title={product.name}
                 description={
                     <>
-                        <div style={{fontWeight: 'bold'}}>${priceFormat(product.price)}.-</div>
+                        <div style={{fontWeight: 'bold'}}>
+                            ${priceFormat(product.activeItemPrice?.price ?? product.price)}.-
+                        </div>
                         <div
                             style={{
                                 color: 'gray',

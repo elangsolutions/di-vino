@@ -187,29 +187,70 @@ export type PaymentPreference = {
   qrCodeBase64: Scalars['String']['output'];
 };
 
+export type ItemPrice = {
+  __typename?: 'ItemPrice';
+  _id: Scalars['ID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  fromDate: Scalars['DateTime']['output'];
+  price: Scalars['Float']['output'];
+  productId: Scalars['String']['output'];
+  promotionCodes?: Maybe<Array<Scalars['String']['output']>>;
+  stock: Scalars['Int']['output'];
+  toDate: Scalars['DateTime']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type Product = {
   __typename?: 'Product';
   _id: Scalars['ID']['output'];
+  activeItemPrice?: Maybe<ItemPrice>;
   category: Scalars['String']['output'];
   details?: Maybe<Scalars['String']['output']>;
   image?: Maybe<Scalars['String']['output']>;
   name: Scalars['String']['output'];
+  /** @deprecated Use ItemPrice instead (supports scheduled/promotional pricing windows by date range). */
   price: Scalars['Float']['output'];
   stock: Scalars['Float']['output'];
 };
 
 export type Query = {
   __typename?: 'Query';
+  activeItemPrice?: Maybe<ItemPrice>;
+  availableProducts: Array<Product>;
   categories: Array<Category>;
   category: Category;
+  itemPrice?: Maybe<ItemPrice>;
+  itemPrices: Array<ItemPrice>;
+  itemPricesByProduct: Array<ItemPrice>;
   orders: Array<Order>;
   product: Product;
   products: Array<Product>;
 };
 
 
+export type QueryActiveItemPriceArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+  productId: Scalars['String']['input'];
+};
+
+
+export type QueryAvailableProductsArgs = {
+  at?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+
 export type QueryCategoryArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryItemPriceArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryItemPricesByProductArgs = {
+  productId: Scalars['String']['input'];
 };
 
 

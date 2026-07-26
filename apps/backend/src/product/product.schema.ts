@@ -16,7 +16,10 @@ export class Product extends Document {
   @Prop()
   details: string;
 
-  @Field()
+  @Field({
+    deprecationReason:
+      'Use ItemPrice instead (supports scheduled/promotional pricing windows by date range).',
+  })
   @Prop()
   price: number;
 

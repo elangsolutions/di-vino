@@ -2,9 +2,8 @@ import React, {useMemo} from 'react';
 import {Card, Button, Typography, Divider, Empty} from 'antd';
 import {MinusOutlined, PlusOutlined, DeleteOutlined} from '@ant-design/icons';
 import {useSelector} from "react-redux";
-import {priceFormat} from "../../../utils";
+import {getProductImage, priceFormat} from "../../../utils";
 import {RootState} from "../../../store/store";
-import NO_IMAGE from "../../../assets/place_holder.png";
 
 interface CartProps {
     onIncrease: (id: string) => void;
@@ -32,7 +31,7 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
                     quantity: item[1],
                     price: product.price,
                     name: product.name,
-                    image: (product as any).image,
+                    image: getProductImage(product.image, product.category),
                 };
             }).filter((p) => p !== null) as {
                 id: string; quantity: number; price: number; name: string; image?: string;
@@ -64,7 +63,7 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
                     }}
                 >
                     <img
-                        src={product.image || NO_IMAGE}
+                        src={product.image}
                         alt={product.name}
                         style={{
                             width: 48,

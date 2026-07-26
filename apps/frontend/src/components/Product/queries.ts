@@ -13,6 +13,26 @@ export const GET_PRODUCTS = gql`
   }
 `;
 
+export const GET_AVAILABLE_PRODUCTS = gql`
+  query GetAvailableProducts {
+    availableProducts {
+      _id
+      name
+      details
+      category
+      image
+      activeItemPrice {
+        _id
+        price
+        stock
+        fromDate
+        toDate
+        promotionCodes
+      }
+    }
+  }
+`;
+
 export const ADD_PRODUCT = gql`
   mutation AddProduct($input: AddProductInput!) {
     addProduct(input: $input) {

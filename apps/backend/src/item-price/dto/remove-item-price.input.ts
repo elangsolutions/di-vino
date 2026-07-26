@@ -1,7 +1,7 @@
 import { InputType, Field } from '@nestjs/graphql';
 
 @InputType()
-export class RemoveCategoryInput {
-    @Field()
-    _id: string;
+export class RemoveItemPriceInput {
+  @Field()
+  _id: string;
 }

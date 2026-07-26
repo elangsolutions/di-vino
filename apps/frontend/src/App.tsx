@@ -13,6 +13,8 @@ import {store} from './store/store';
 import ProductListPage from "./pages/AdminPage/Products/ProductList";
 import CategoryListPage from "./pages/AdminPage/Categories/CategoryList";
 import CategoryForm from "./pages/AdminPage/Categories/CategoryForm";
+import ItemPriceListPage from "./pages/AdminPage/ItemPrices/ItemPriceList";
+import ItemPriceForm from "./pages/AdminPage/ItemPrices/ItemPriceForm";
 import CartPage from "./pages/CartPage";
 
 
@@ -68,6 +70,19 @@ const App = () => {
                                             <InstanceFormPage
                                                 entityName="categoría"
                                                 renderForm={(id) => <CategoryForm categoryId={id}/>}
+                                            />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route path="item-prices" element={<ItemPriceListPage/>}/>
+                                <Route
+                                    path="/admin/item-prices/:id"
+                                    element={
+                                        <PrivateRoute>
+                                            <InstanceFormPage
+                                                entityName="precio"
+                                                renderForm={(id) => <ItemPriceForm itemPriceId={id}/>}
                                             />
                                         </PrivateRoute>
                                     }

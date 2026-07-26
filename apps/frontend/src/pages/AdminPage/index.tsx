@@ -18,6 +18,7 @@ const AdminPage = () => {
                 >
                     <Menu.Item key="products">Productos</Menu.Item>
                     <Menu.Item key="categories">Categorías</Menu.Item>
+                    <Menu.Item key="item-prices">Precios</Menu.Item>
                 </Menu>
             </Sider>
 

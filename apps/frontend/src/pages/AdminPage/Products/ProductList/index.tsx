@@ -58,6 +58,7 @@ const ProductListPage = () => {
                             extra={
                                 <Space>
                                     <Link to={`/admin/products/${product._id}`}>Editar</Link>
+                                    <Link to={`/admin/item-prices?productId=${product._id}`}>Precios</Link>
                                     <a
                                         onClick={() => handleDelete(product)}
                                         style={{ color: "red", cursor: "pointer" }}
