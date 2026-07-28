@@ -34,6 +34,16 @@ input AddProductInput {
   price: Float
 }
 
+input AddPromotionCodeInput {
+  _id: String
+  code: String!
+  fromDate: DateTime!
+  percentage: Float!
+  productId: String
+  scope: PromotionScope!
+  toDate: DateTime!
+}
+
 type Address {
   city: String!
   postalCode: String!
@@ -97,13 +107,16 @@ type Mutation {
   addCategory(input: AddCategoryInput!): Category!
   addItemPrice(input: AddItemPriceInput!): ItemPrice!
   addProduct(input: AddProductInput!): Product!
+  addPromotionCode(input: AddPromotionCodeInput!): PromotionCode!
   createOrder(input: CreateOrderDraftInput!): Order!
   createPaymentPreference(amount: Float!, description: String!, orderId: String!): PaymentPreference!
   deleteCategory(input: RemoveCategoryInput!): Category
   deleteItemPrice(input: RemoveItemPriceInput!): ItemPrice
   deleteProduct(input: RemoveProductInput!): Product!
+  deletePromotionCode(input: RemovePromotionCodeInput!): PromotionCode
   login(input: LoginInput!): String!
   register(input: RegisterInput!): String!
+  validatePromotionCode(input: ValidatePromotionCodeInput!): PromotionDiscountResult!
 }
 
 type Order {
@@ -162,6 +175,36 @@ type Product {
   stock: Float!
 }
 
+input PromotionCartItemInput {
+  price: Float!
+  productId: String!
+  quantity: Int!
+}
+
+type PromotionCode {
+  _id: ID!
+  code: String!
+  fromDate: DateTime!
+  percentage: Float!
+  productId: String
+  scope: PromotionScope!
+  toDate: DateTime!
+}
+
+type PromotionDiscountResult {
+  discountAmount: Float!
+  finalTotal: Float!
+  message: String
+  originalTotal: Float!
+  promotionCode: PromotionCode
+  valid: Boolean!
+}
+
+enum PromotionScope {
+  ORDER
+  PRODUCT
+}
+
 type Query {
   activeItemPrice(at: DateTime, productId: String!): ItemPrice
   availableProducts(at: DateTime): [Product!]!
@@ -173,6 +216,8 @@ type Query {
   orders: [Order!]!
   product(id: String!): Product!
   products: [Product!]!
+  promotionCode(id: String!): PromotionCode
+  promotionCodes: [PromotionCode!]!
 }
 
 input RegisterInput {
@@ -190,4 +235,13 @@ input RemoveItemPriceInput {
 
 input RemoveProductInput {
   _id: String
+}
+
+input RemovePromotionCodeInput {
+  _id: String!
+}
+
+input ValidatePromotionCodeInput {
+  code: String!
+  items: [PromotionCartItemInput!]!
 }

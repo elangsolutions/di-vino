@@ -15,6 +15,8 @@ import CategoryListPage from "./pages/AdminPage/Categories/CategoryList";
 import CategoryForm from "./pages/AdminPage/Categories/CategoryForm";
 import ItemPriceListPage from "./pages/AdminPage/ItemPrices/ItemPriceList";
 import ItemPriceForm from "./pages/AdminPage/ItemPrices/ItemPriceForm";
+import PromotionCodeListPage from "./pages/AdminPage/PromotionCodes/PromotionCodeList";
+import PromotionCodeForm from "./pages/AdminPage/PromotionCodes/PromotionCodeForm";
 import CartPage from "./pages/CartPage";
 
 
@@ -83,6 +85,19 @@ const App = () => {
                                             <InstanceFormPage
                                                 entityName="precio"
                                                 renderForm={(id) => <ItemPriceForm itemPriceId={id}/>}
+                                            />
+                                        </PrivateRoute>
+                                    }
+                                />
+
+                                <Route path="promotion-codes" element={<PromotionCodeListPage/>}/>
+                                <Route
+                                    path="/admin/promotion-codes/:id"
+                                    element={
+                                        <PrivateRoute>
+                                            <InstanceFormPage
+                                                entityName="código promocional"
+                                                renderForm={(id) => <PromotionCodeForm promotionCodeId={id}/>}
                                             />
                                         </PrivateRoute>
                                     }
