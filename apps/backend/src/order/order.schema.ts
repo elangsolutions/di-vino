@@ -24,6 +24,30 @@ export class OrderItem {
     quantity: number;
 }
 
+export enum OrderIssueReason {
+    OTHER_RECIPIENT = 'other_recipient',
+    DATE_CHANGE = 'date_change',
+    CANCEL = 'cancel',
+    OTHER = 'other',
+}
+
+registerEnumType(OrderIssueReason, { name: 'OrderIssueReason' });
+
+@ObjectType()
+export class OrderIssue {
+    @Field(() => OrderIssueReason)
+    @Prop({ enum: OrderIssueReason, required: true })
+    reason: OrderIssueReason;
+
+    @Field({ nullable: true })
+    @Prop()
+    message?: string;
+
+    @Field()
+    @Prop({ default: Date.now })
+    reportedAt: Date;
+}
+
 @InputType('DeliveryInput')
 export class DeliveryInput {
     @Field(() => DeliveryType)
@@ -54,6 +78,18 @@ export class Order extends Document {
     @Prop({ required: true })
     userId: string;
 
+    @Field({ nullable: true })
+    @Prop()
+    customerName?: string;
+
+    @Field({ nullable: true })
+    @Prop()
+    customerEmail?: string;
+
+    @Field({ nullable: true })
+    @Prop()
+    customerPhone?: string;
+
     @Field()
     @Prop({ default: 'pending_payment' })
     status: 'pending_payment' | 'paid' | 'cancelled';
@@ -73,6 +109,10 @@ export class Order extends Document {
     @Field({ nullable: true })
     @Prop()
     mpQrData?: string;
+
+    @Field(() => [OrderIssue])
+    @Prop({ type: [OrderIssue], default: [] })
+    issues: OrderIssue[];
 
     @Field()
     createdAt: Date;

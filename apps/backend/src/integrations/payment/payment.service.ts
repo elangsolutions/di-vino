@@ -18,6 +18,17 @@ export class PaymentService {
     }
 
     async createQRCode(amount: number, description: string, orderId: string) {
+        if (this.configService.isPaymentTesting) {
+            return {
+                id: `testing_${orderId}`,
+                qrCode: '',
+                qrCodeBase64: '',
+                amount,
+                description,
+                externalReference: orderId,
+            };
+        }
+
         if (!this.configService.mpEnabled) {
             throw new BadRequestException(
                 "Mercado Pago está temporalmente deshabilitado.",

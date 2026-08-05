@@ -8,10 +8,13 @@ import {selectIsDeliveryValid} from "../../store/delivery/slice.ts";
 import CartDelivery from "./CartDelivery";
 import {useNavigate} from "react-router-dom";
 import CartPayment from "./CartPayment";
+import CartContact from "./CartContact";
 
 const CartPage = () => {
     const navigate = useNavigate();
     const [current, setCurrent] = useState(0);
+    const [contactSaved, setContactSaved] = useState(false);
+    const [bypassPayment, setBypassPayment] = useState(false);
     const dispatch = useDispatch()
     const cartItemsCount = useSelector(getCartItemsCount);
     const isDeliveryValid = useSelector(selectIsDeliveryValid);
@@ -34,6 +37,7 @@ const CartPage = () => {
             canProceed: cartItemsCount > 0,
             blockedMessage: 'Agregá al menos un producto para continuar.',
             nextLabel: 'Siguiente',
+            showFooter: true,
         },
         {
             title: 'Entrega',
@@ -41,13 +45,30 @@ const CartPage = () => {
             canProceed: isDeliveryValid,
             blockedMessage: 'Completá los datos de entrega para continuar.',
             nextLabel: 'Siguiente',
+            showFooter: true,
         },
         {
             title: 'Pago',
-            content: <CartPayment />,
+            content: <CartPayment onBypassChange={setBypassPayment} />,
             canProceed: true,
             blockedMessage: '',
-            nextLabel: 'Confirmar pedido',
+            nextLabel: bypassPayment ? 'Continuar sin pago' : 'Ya pagué / Continuar',
+            showFooter: true,
+        },
+        {
+            title: 'Contacto',
+            content: (
+                <CartContact
+                    onCompleted={() => {
+                        setContactSaved(true);
+                        setCurrent((prev) => prev + 1);
+                    }}
+                />
+            ),
+            canProceed: contactSaved,
+            blockedMessage: 'Completá tus datos de contacto para finalizar.',
+            nextLabel: '',
+            showFooter: false,
         },
         {
             title: 'Listo',
@@ -62,6 +83,7 @@ const CartPage = () => {
             canProceed: false,
             blockedMessage: '',
             nextLabel: '',
+            showFooter: false,
         }
     ];
 
@@ -88,7 +110,7 @@ const CartPage = () => {
             <Steps current={current} items={items} size="small" responsive />
             <div style={{paddingTop: '24px'}}>{activeStep.content}</div>
 
-            {!isLastStep && (
+            {activeStep.showFooter && !isLastStep && (
                 <div
                     style={{
                         position: 'sticky',
@@ -123,7 +145,10 @@ const CartPage = () => {
             )}
 
             {isLastStep && (
-                <div style={{paddingTop: 24, textAlign: 'center'}}>
+                <div style={{paddingTop: 24, textAlign: 'center', display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap'}}>
+                    <Button size="large" onClick={() => navigate('/orders')}>
+                        Ver mis pedidos
+                    </Button>
                     <Button type="primary" size="large" onClick={() => navigate('/')}>
                         Volver al inicio
                     </Button>

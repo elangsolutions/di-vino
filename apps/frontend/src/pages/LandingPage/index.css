@@ -7,84 +7,140 @@
     padding-bottom: 30px;
 }
 
-/* Header/content padding is controlled inline (see LandingPage isMobile logic)
-   to keep a single source of truth for the mobile breakpoint. */
+.catalog-filters {
+    margin-bottom: 24px;
+}
+
+.category-tabs.ant-tabs {
+    margin-bottom: 0;
+}
+
+.category-tabs .ant-tabs-nav {
+    margin-bottom: 12px;
+}
+
+.category-tabs .ant-tabs-nav::before {
+    border-bottom-color: #f0f0f0;
+}
+
+.category-tabs .ant-tabs-tab {
+    padding: 8px 4px;
+    font-size: 14px;
+}
+
+.category-tabs .ant-tabs-tab + .ant-tabs-tab {
+    margin-left: 20px;
+}
+
+.category-tabs .ant-tabs-ink-bar {
+    background: #5ea18b;
+}
+
+.category-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: #5ea18b;
+    font-weight: 600;
+}
+
+.category-tabs .ant-tabs-tab:hover .ant-tabs-tab-btn {
+    color: #5ea18b;
+}
+
+/* Keep category tabs in one swipeable row (no "more" dropdown). */
+.category-tabs .ant-tabs-nav-operations {
+    display: none !important;
+}
+
+.category-tabs .ant-tabs-nav-wrap {
+    overflow-x: auto !important;
+    scrollbar-width: none;
+}
+
+.category-tabs .ant-tabs-nav-wrap::-webkit-scrollbar {
+    display: none;
+}
+
+.category-tabs .ant-tabs-nav-list {
+    flex-wrap: nowrap !important;
+    transform: none !important;
+}
+
+.price-filter {
+    max-width: 420px;
+    padding: 0 4px;
+}
+
+.price-filter-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 4px;
+}
+
+.price-filter .ant-slider {
+    margin: 4px 6px 0;
+}
+
 @media (max-width: 768px) {
-    .filter-section {
-        margin-bottom: 20px;
+    .catalog-filters {
+        margin-bottom: 16px;
     }
 
-    /* Ensure proper spacing for mobile */
+    .category-tabs .ant-tabs-tab {
+        padding: 6px 2px;
+        font-size: 13px;
+    }
+
+    .category-tabs .ant-tabs-tab + .ant-tabs-tab {
+        margin-left: 16px;
+    }
+
+    .price-filter {
+        max-width: none;
+    }
+
     .ant-row-rtl,
     .ant-row {
         width: 100%;
     }
 
-    /* Center the quantity +/- controls on product cards */
     .product-card-actions {
         justify-content: center;
     }
 }
 
 @media (min-width: 769px) {
-    .filter-section {
-        margin-bottom: 32px;
+    .catalog-filters {
+        margin-bottom: 28px;
     }
 }
 
-/* Smooth transitions */
 .ant-btn {
     transition: all 0.3s ease !important;
-}
-
-.ant-select:hover {
-    border-color: #5ea18b !important;
 }
 
 .ant-slider-track {
     background-color: #5ea18b !important;
 }
 
-.ant-slider-handle {
-    border-color: #5ea18b !important;
+.ant-slider-handle::after {
+    box-shadow: 0 0 0 2px #5ea18b !important;
 }
 
-.ant-slider-handle:focus {
-    box-shadow: 0 0 0 5px rgba(94, 161, 139, 0.1) !important;
+.ant-slider-handle:focus::after {
+    box-shadow: 0 0 0 2px #5ea18b, 0 0 0 5px rgba(94, 161, 139, 0.15) !important;
 }
 
-/* Header shadow and styling */
 .ant-layout-header {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
-/* Cart icon hover effect */
 .ant-btn-text:hover {
     color: #5ea18b !important;
     transform: scale(1.1);
     transition: all 0.2s ease;
 }
 
-/* Filter button styling */
-.ant-btn-default {
-    border-color: #d9d9d9;
-}
-
-.ant-btn-default:hover {
-    border-color: #5ea18b;
-    color: #5ea18b;
-}
-
-/* Drawer styling for mobile filters */
-.ant-drawer-header {
-    border-bottom: 1px solid #f0f0f0;
-}
-
-.ant-drawer-body {
-    padding: 20px;
-}
-
-/* Product grid responsive */
 @media (max-width: 576px) {
     .ant-row-gutter-16 > .ant-col {
         width: 100%;
@@ -97,7 +153,6 @@
     }
 }
 
-/* Smooth fade-in animation */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -112,4 +167,3 @@
 section {
     animation: fadeIn 0.5s ease-in-out;
 }
-

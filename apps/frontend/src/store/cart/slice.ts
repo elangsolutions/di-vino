@@ -29,10 +29,13 @@ const slice = createSlice({
             const id = action.payload.productId;
             delete state.quantities[id]
         },
+        clearCart: (state) => {
+            state.quantities = {};
+        },
     },
 });
 
-export const { increment, decrement, remove } = slice.actions;
+export const { increment, decrement, remove, clearCart } = slice.actions;
 export default slice.reducer;
 
 // Counts distinct products actually in the cart (quantity > 0), not stale/zeroed keys.

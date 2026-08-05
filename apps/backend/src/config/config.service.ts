@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService as NestConfigService } from '@nestjs/config';
+import { PaymentMode } from './configuration';
 
 @Injectable()
 export class ConfigService {
@@ -14,11 +15,19 @@ export class ConfigService {
   }
 
   get mpAccessToken():string | undefined{
-    return this.nestConfig.get<string>('MP_ACCESS_TOKEN') || '1234qwerty';
+    return this.nestConfig.get<string>('mpAccessToken') || '1234qwerty';
   }
 
   get mpEnabled(): boolean {
-    return this.nestConfig.get<boolean>('MP_ENABLED') ?? false;
+    return this.nestConfig.get<boolean>('mpEnabled') ?? false;
+  }
+
+  get paymentMode(): PaymentMode {
+    return this.nestConfig.get<PaymentMode>('paymentMode') ?? 'live';
+  }
+
+  get isPaymentTesting(): boolean {
+    return this.paymentMode === 'testing';
   }
 
   get divinoApp(): string | undefined {

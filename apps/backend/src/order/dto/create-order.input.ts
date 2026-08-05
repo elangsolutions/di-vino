@@ -42,4 +42,13 @@ export class CreateOrderDraftInput {
 
     @Field()
     userId: string;
+
+    @Field()
+    customerName: string;
+
+    @Field()
+    customerEmail: string;
+
+    @Field()
+    customerPhone: string;
 }
