@@ -63,7 +63,6 @@ input CreateOrderDraftInput {
   customerPhone: String!
   delivery: DeliveryInput!
   items: [OrderItemInput!]!
-  state: OrderState!
   userId: String!
 }
 
@@ -75,12 +74,16 @@ scalar DateTime
 type Delivery {
   address: Address
   locationId: String
+  scheduledDate: DateTime
+  timeSlot: String
   type: DeliveryType!
 }
 
 input DeliveryInput {
   address: AddAddressInput
   locationId: String
+  scheduledDate: DateTime
+  timeSlot: String
   type: DeliveryType!
 }
 
@@ -120,11 +123,13 @@ type Mutation {
   login(input: LoginInput!): String!
   register(input: RegisterInput!): String!
   reportOrderIssue(input: ReportOrderIssueInput!): Order!
+  updateOrderStatus(input: UpdateOrderStatusInput!): Order!
   validatePromotionCode(input: ValidatePromotionCodeInput!): PromotionDiscountResult!
 }
 
 type Order {
   _id: ID!
+  allowedTransitions: [OrderStatus!]!
   createdAt: DateTime!
   customerEmail: String
   customerName: String
@@ -136,7 +141,7 @@ type Order {
   mpInitPoint: String
   mpPreferenceId: String
   mpQrData: String
-  status: String!
+  status: OrderStatus!
   updatedAt: DateTime!
   userId: String!
 }
@@ -168,12 +173,14 @@ input OrderItemInput {
   title: String!
 }
 
-enum OrderState {
+enum OrderStatus {
+  CANCELLED
   CLOSED
   DELIVERED
-  DRAFT
-  OPEN
   PAID
+  PENDING_PAYMENT
+  PREPARING
+  READY
 }
 
 type PaymentConfig {
@@ -273,6 +280,11 @@ input ReportOrderIssueInput {
   message: String
   orderId: String!
   reason: OrderIssueReason!
+}
+
+input UpdateOrderStatusInput {
+  orderId: String!
+  status: OrderStatus!
 }
 
 input ValidatePromotionCodeInput {

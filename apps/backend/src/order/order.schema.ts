@@ -48,6 +48,32 @@ export class OrderIssue {
     reportedAt: Date;
 }
 
+export enum OrderStatus {
+    PENDING_PAYMENT = 'pending_payment',
+    PAID = 'paid',
+    PREPARING = 'preparing',
+    READY = 'ready',
+    DELIVERED = 'delivered',
+    CLOSED = 'closed',
+    CANCELLED = 'cancelled',
+}
+
+registerEnumType(OrderStatus, { name: 'OrderStatus' });
+
+/**
+ * Forward-only lifecycle: an order can advance one step at a time, or be
+ * cancelled at any point before it is delivered.
+ */
+export const ORDER_STATUS_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
+    [OrderStatus.PENDING_PAYMENT]: [OrderStatus.PAID, OrderStatus.CANCELLED],
+    [OrderStatus.PAID]: [OrderStatus.PREPARING, OrderStatus.CANCELLED],
+    [OrderStatus.PREPARING]: [OrderStatus.READY, OrderStatus.CANCELLED],
+    [OrderStatus.READY]: [OrderStatus.DELIVERED, OrderStatus.CANCELLED],
+    [OrderStatus.DELIVERED]: [OrderStatus.CLOSED],
+    [OrderStatus.CLOSED]: [],
+    [OrderStatus.CANCELLED]: [],
+};
+
 @InputType('DeliveryInput')
 export class DeliveryInput {
     @Field(() => DeliveryType)
@@ -58,6 +84,12 @@ export class DeliveryInput {
 
     @Field(() => AddAddressInput, { nullable: true })
     address?: AddAddressInput;
+
+    @Field(() => Date, { nullable: true })
+    scheduledDate?: Date;
+
+    @Field({ nullable: true })
+    timeSlot?: string;
 }
 
 @ObjectType()
@@ -90,9 +122,9 @@ export class Order extends Document {
     @Prop()
     customerPhone?: string;
 
-    @Field()
-    @Prop({ default: 'pending_payment' })
-    status: 'pending_payment' | 'paid' | 'cancelled';
+    @Field(() => OrderStatus)
+    @Prop({ enum: OrderStatus, default: OrderStatus.PENDING_PAYMENT })
+    status: OrderStatus;
 
     @Field({ nullable: true })
     @Prop()

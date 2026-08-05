@@ -31,13 +31,33 @@ export type AddCategoryInput = {
   name: Scalars['String']['input'];
 };
 
+export type AddItemPriceInput = {
+  _id?: InputMaybe<Scalars['String']['input']>;
+  fromDate: Scalars['DateTime']['input'];
+  price: Scalars['Float']['input'];
+  productId: Scalars['String']['input'];
+  promotionCodes?: InputMaybe<Array<Scalars['String']['input']>>;
+  stock: Scalars['Int']['input'];
+  toDate: Scalars['DateTime']['input'];
+};
+
 export type AddProductInput = {
   _id?: InputMaybe<Scalars['String']['input']>;
   category: Scalars['String']['input'];
   details: Scalars['String']['input'];
   image?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
-  price: Scalars['Float']['input'];
+  price?: InputMaybe<Scalars['Float']['input']>;
+};
+
+export type AddPromotionCodeInput = {
+  _id?: InputMaybe<Scalars['String']['input']>;
+  code: Scalars['String']['input'];
+  fromDate: Scalars['DateTime']['input'];
+  percentage: Scalars['Float']['input'];
+  productId?: InputMaybe<Scalars['String']['input']>;
+  scope: PromotionScope;
+  toDate: Scalars['DateTime']['input'];
 };
 
 export type Address = {
@@ -56,9 +76,11 @@ export type Category = {
 };
 
 export type CreateOrderDraftInput = {
+  customerEmail: Scalars['String']['input'];
+  customerName: Scalars['String']['input'];
+  customerPhone: Scalars['String']['input'];
   delivery: DeliveryInput;
   items: Array<OrderItemInput>;
-  state: OrderState;
   userId: Scalars['String']['input'];
 };
 
@@ -66,12 +88,16 @@ export type Delivery = {
   __typename?: 'Delivery';
   address?: Maybe<Address>;
   locationId?: Maybe<Scalars['String']['output']>;
+  scheduledDate?: Maybe<Scalars['DateTime']['output']>;
+  timeSlot?: Maybe<Scalars['String']['output']>;
   type: DeliveryType;
 };
 
 export type DeliveryInput = {
   address?: InputMaybe<AddAddressInput>;
   locationId?: InputMaybe<Scalars['String']['input']>;
+  scheduledDate?: InputMaybe<Scalars['DateTime']['input']>;
+  timeSlot?: InputMaybe<Scalars['String']['input']>;
   type: DeliveryType;
 };
 
@@ -79,6 +105,19 @@ export enum DeliveryType {
   Address = 'ADDRESS',
   Pickup = 'PICKUP'
 }
+
+export type ItemPrice = {
+  __typename?: 'ItemPrice';
+  _id: Scalars['ID']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  fromDate: Scalars['DateTime']['output'];
+  price: Scalars['Float']['output'];
+  productId: Scalars['String']['output'];
+  promotionCodes?: Maybe<Array<Scalars['String']['output']>>;
+  stock: Scalars['Int']['output'];
+  toDate: Scalars['DateTime']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
 
 export type LoginInput = {
   email: Scalars['String']['input'];
@@ -88,13 +127,20 @@ export type LoginInput = {
 export type Mutation = {
   __typename?: 'Mutation';
   addCategory: Category;
+  addItemPrice: ItemPrice;
   addProduct: Product;
+  addPromotionCode: PromotionCode;
   createOrder: Order;
   createPaymentPreference: PaymentPreference;
   deleteCategory?: Maybe<Category>;
+  deleteItemPrice?: Maybe<ItemPrice>;
   deleteProduct: Product;
+  deletePromotionCode?: Maybe<PromotionCode>;
   login: Scalars['String']['output'];
   register: Scalars['String']['output'];
+  reportOrderIssue: Order;
+  updateOrderStatus: Order;
+  validatePromotionCode: PromotionDiscountResult;
 };
 
 
@@ -103,8 +149,18 @@ export type MutationAddCategoryArgs = {
 };
 
 
+export type MutationAddItemPriceArgs = {
+  input: AddItemPriceInput;
+};
+
+
 export type MutationAddProductArgs = {
   input: AddProductInput;
+};
+
+
+export type MutationAddPromotionCodeArgs = {
+  input: AddPromotionCodeInput;
 };
 
 
@@ -125,8 +181,18 @@ export type MutationDeleteCategoryArgs = {
 };
 
 
+export type MutationDeleteItemPriceArgs = {
+  input: RemoveItemPriceInput;
+};
+
+
 export type MutationDeleteProductArgs = {
   input: RemoveProductInput;
+};
+
+
+export type MutationDeletePromotionCodeArgs = {
+  input: RemovePromotionCodeInput;
 };
 
 
@@ -139,20 +205,54 @@ export type MutationRegisterArgs = {
   input: RegisterInput;
 };
 
+
+export type MutationReportOrderIssueArgs = {
+  input: ReportOrderIssueInput;
+};
+
+
+export type MutationUpdateOrderStatusArgs = {
+  input: UpdateOrderStatusInput;
+};
+
+
+export type MutationValidatePromotionCodeArgs = {
+  input: ValidatePromotionCodeInput;
+};
+
 export type Order = {
   __typename?: 'Order';
   _id: Scalars['ID']['output'];
+  allowedTransitions: Array<OrderStatus>;
   createdAt: Scalars['DateTime']['output'];
+  customerEmail?: Maybe<Scalars['String']['output']>;
+  customerName?: Maybe<Scalars['String']['output']>;
+  customerPhone?: Maybe<Scalars['String']['output']>;
   delivery: Delivery;
   external_reference: Scalars['String']['output'];
+  issues: Array<OrderIssue>;
   items: Array<OrderItem>;
   mpInitPoint?: Maybe<Scalars['String']['output']>;
   mpPreferenceId?: Maybe<Scalars['String']['output']>;
   mpQrData?: Maybe<Scalars['String']['output']>;
-  status: Scalars['String']['output'];
+  status: OrderStatus;
   updatedAt: Scalars['DateTime']['output'];
   userId: Scalars['String']['output'];
 };
+
+export type OrderIssue = {
+  __typename?: 'OrderIssue';
+  message?: Maybe<Scalars['String']['output']>;
+  reason: OrderIssueReason;
+  reportedAt: Scalars['DateTime']['output'];
+};
+
+export enum OrderIssueReason {
+  Cancel = 'CANCEL',
+  DateChange = 'DATE_CHANGE',
+  Other = 'OTHER',
+  OtherRecipient = 'OTHER_RECIPIENT'
+}
 
 export type OrderItem = {
   __typename?: 'OrderItem';
@@ -169,13 +269,21 @@ export type OrderItemInput = {
   title: Scalars['String']['input'];
 };
 
-export enum OrderState {
+export enum OrderStatus {
+  Cancelled = 'CANCELLED',
   Closed = 'CLOSED',
   Delivered = 'DELIVERED',
-  Draft = 'DRAFT',
-  Open = 'OPEN',
-  Paid = 'PAID'
+  Paid = 'PAID',
+  PendingPayment = 'PENDING_PAYMENT',
+  Preparing = 'PREPARING',
+  Ready = 'READY'
 }
+
+export type PaymentConfig = {
+  __typename?: 'PaymentConfig';
+  bypassPayment: Scalars['Boolean']['output'];
+  mode: Scalars['String']['output'];
+};
 
 export type PaymentPreference = {
   __typename?: 'PaymentPreference';
@@ -185,19 +293,6 @@ export type PaymentPreference = {
   id: Scalars['ID']['output'];
   qrCode: Scalars['String']['output'];
   qrCodeBase64: Scalars['String']['output'];
-};
-
-export type ItemPrice = {
-  __typename?: 'ItemPrice';
-  _id: Scalars['ID']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  fromDate: Scalars['DateTime']['output'];
-  price: Scalars['Float']['output'];
-  productId: Scalars['String']['output'];
-  promotionCodes?: Maybe<Array<Scalars['String']['output']>>;
-  stock: Scalars['Int']['output'];
-  toDate: Scalars['DateTime']['output'];
-  updatedAt: Scalars['DateTime']['output'];
 };
 
 export type Product = {
@@ -213,6 +308,38 @@ export type Product = {
   stock: Scalars['Float']['output'];
 };
 
+export type PromotionCartItemInput = {
+  price: Scalars['Float']['input'];
+  productId: Scalars['String']['input'];
+  quantity: Scalars['Int']['input'];
+};
+
+export type PromotionCode = {
+  __typename?: 'PromotionCode';
+  _id: Scalars['ID']['output'];
+  code: Scalars['String']['output'];
+  fromDate: Scalars['DateTime']['output'];
+  percentage: Scalars['Float']['output'];
+  productId?: Maybe<Scalars['String']['output']>;
+  scope: PromotionScope;
+  toDate: Scalars['DateTime']['output'];
+};
+
+export type PromotionDiscountResult = {
+  __typename?: 'PromotionDiscountResult';
+  discountAmount: Scalars['Float']['output'];
+  finalTotal: Scalars['Float']['output'];
+  message?: Maybe<Scalars['String']['output']>;
+  originalTotal: Scalars['Float']['output'];
+  promotionCode?: Maybe<PromotionCode>;
+  valid: Scalars['Boolean']['output'];
+};
+
+export enum PromotionScope {
+  Order = 'ORDER',
+  Product = 'PRODUCT'
+}
+
 export type Query = {
   __typename?: 'Query';
   activeItemPrice?: Maybe<ItemPrice>;
@@ -222,9 +349,13 @@ export type Query = {
   itemPrice?: Maybe<ItemPrice>;
   itemPrices: Array<ItemPrice>;
   itemPricesByProduct: Array<ItemPrice>;
+  order: Order;
   orders: Array<Order>;
+  paymentConfig: PaymentConfig;
   product: Product;
   products: Array<Product>;
+  promotionCode?: Maybe<PromotionCode>;
+  promotionCodes: Array<PromotionCode>;
 };
 
 
@@ -254,7 +385,17 @@ export type QueryItemPricesByProductArgs = {
 };
 
 
+export type QueryOrderArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryProductArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryPromotionCodeArgs = {
   id: Scalars['String']['input'];
 };
 
@@ -264,11 +405,35 @@ export type RegisterInput = {
 };
 
 export type RemoveCategoryInput = {
-  _id?: InputMaybe<Scalars['String']['input']>;
+  _id: Scalars['String']['input'];
+};
+
+export type RemoveItemPriceInput = {
+  _id: Scalars['String']['input'];
 };
 
 export type RemoveProductInput = {
   _id?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type RemovePromotionCodeInput = {
+  _id: Scalars['String']['input'];
+};
+
+export type ReportOrderIssueInput = {
+  message?: InputMaybe<Scalars['String']['input']>;
+  orderId: Scalars['String']['input'];
+  reason: OrderIssueReason;
+};
+
+export type UpdateOrderStatusInput = {
+  orderId: Scalars['String']['input'];
+  status: OrderStatus;
+};
+
+export type ValidatePromotionCodeInput = {
+  code: Scalars['String']['input'];
+  items: Array<PromotionCartItemInput>;
 };
 
 
@@ -344,7 +509,9 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   AddAddressInput: AddAddressInput;
   AddCategoryInput: AddCategoryInput;
+  AddItemPriceInput: AddItemPriceInput;
   AddProductInput: AddProductInput;
+  AddPromotionCodeInput: AddPromotionCodeInput;
   Address: ResolverTypeWrapper<Address>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   Category: ResolverTypeWrapper<Category>;
@@ -355,26 +522,42 @@ export type ResolversTypes = {
   DeliveryType: DeliveryType;
   Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  Int: ResolverTypeWrapper<Scalars['Int']['output']>;
+  ItemPrice: ResolverTypeWrapper<ItemPrice>;
   LoginInput: LoginInput;
   Mutation: ResolverTypeWrapper<{}>;
   Order: ResolverTypeWrapper<Order>;
+  OrderIssue: ResolverTypeWrapper<OrderIssue>;
+  OrderIssueReason: OrderIssueReason;
   OrderItem: ResolverTypeWrapper<OrderItem>;
   OrderItemInput: OrderItemInput;
-  OrderState: OrderState;
+  OrderStatus: OrderStatus;
+  PaymentConfig: ResolverTypeWrapper<PaymentConfig>;
   PaymentPreference: ResolverTypeWrapper<PaymentPreference>;
   Product: ResolverTypeWrapper<Product>;
+  PromotionCartItemInput: PromotionCartItemInput;
+  PromotionCode: ResolverTypeWrapper<PromotionCode>;
+  PromotionDiscountResult: ResolverTypeWrapper<PromotionDiscountResult>;
+  PromotionScope: PromotionScope;
   Query: ResolverTypeWrapper<{}>;
   RegisterInput: RegisterInput;
   RemoveCategoryInput: RemoveCategoryInput;
+  RemoveItemPriceInput: RemoveItemPriceInput;
   RemoveProductInput: RemoveProductInput;
+  RemovePromotionCodeInput: RemovePromotionCodeInput;
+  ReportOrderIssueInput: ReportOrderIssueInput;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  UpdateOrderStatusInput: UpdateOrderStatusInput;
+  ValidatePromotionCodeInput: ValidatePromotionCodeInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   AddAddressInput: AddAddressInput;
   AddCategoryInput: AddCategoryInput;
+  AddItemPriceInput: AddItemPriceInput;
   AddProductInput: AddProductInput;
+  AddPromotionCodeInput: AddPromotionCodeInput;
   Address: Address;
   Boolean: Scalars['Boolean']['output'];
   Category: Category;
@@ -384,18 +567,30 @@ export type ResolversParentTypes = {
   DeliveryInput: DeliveryInput;
   Float: Scalars['Float']['output'];
   ID: Scalars['ID']['output'];
+  Int: Scalars['Int']['output'];
+  ItemPrice: ItemPrice;
   LoginInput: LoginInput;
   Mutation: {};
   Order: Order;
+  OrderIssue: OrderIssue;
   OrderItem: OrderItem;
   OrderItemInput: OrderItemInput;
+  PaymentConfig: PaymentConfig;
   PaymentPreference: PaymentPreference;
   Product: Product;
+  PromotionCartItemInput: PromotionCartItemInput;
+  PromotionCode: PromotionCode;
+  PromotionDiscountResult: PromotionDiscountResult;
   Query: {};
   RegisterInput: RegisterInput;
   RemoveCategoryInput: RemoveCategoryInput;
+  RemoveItemPriceInput: RemoveItemPriceInput;
   RemoveProductInput: RemoveProductInput;
+  RemovePromotionCodeInput: RemovePromotionCodeInput;
+  ReportOrderIssueInput: ReportOrderIssueInput;
   String: Scalars['String']['output'];
+  UpdateOrderStatusInput: UpdateOrderStatusInput;
+  ValidatePromotionCodeInput: ValidatePromotionCodeInput;
 };
 
 export type AddressResolvers<ContextType = any, ParentType extends ResolversParentTypes['Address'] = ResolversParentTypes['Address']> = {
@@ -420,33 +615,67 @@ export interface DateTimeScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 export type DeliveryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Delivery'] = ResolversParentTypes['Delivery']> = {
   address?: Resolver<Maybe<ResolversTypes['Address']>, ParentType, ContextType>;
   locationId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scheduledDate?: Resolver<Maybe<ResolversTypes['DateTime']>, ParentType, ContextType>;
+  timeSlot?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   type?: Resolver<ResolversTypes['DeliveryType'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type ItemPriceResolvers<ContextType = any, ParentType extends ResolversParentTypes['ItemPrice'] = ResolversParentTypes['ItemPrice']> = {
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  fromDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  productId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  promotionCodes?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, ContextType>;
+  stock?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
+  toDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   addCategory?: Resolver<ResolversTypes['Category'], ParentType, ContextType, RequireFields<MutationAddCategoryArgs, 'input'>>;
+  addItemPrice?: Resolver<ResolversTypes['ItemPrice'], ParentType, ContextType, RequireFields<MutationAddItemPriceArgs, 'input'>>;
   addProduct?: Resolver<ResolversTypes['Product'], ParentType, ContextType, RequireFields<MutationAddProductArgs, 'input'>>;
+  addPromotionCode?: Resolver<ResolversTypes['PromotionCode'], ParentType, ContextType, RequireFields<MutationAddPromotionCodeArgs, 'input'>>;
   createOrder?: Resolver<ResolversTypes['Order'], ParentType, ContextType, RequireFields<MutationCreateOrderArgs, 'input'>>;
   createPaymentPreference?: Resolver<ResolversTypes['PaymentPreference'], ParentType, ContextType, RequireFields<MutationCreatePaymentPreferenceArgs, 'amount' | 'description' | 'orderId'>>;
   deleteCategory?: Resolver<Maybe<ResolversTypes['Category']>, ParentType, ContextType, RequireFields<MutationDeleteCategoryArgs, 'input'>>;
+  deleteItemPrice?: Resolver<Maybe<ResolversTypes['ItemPrice']>, ParentType, ContextType, RequireFields<MutationDeleteItemPriceArgs, 'input'>>;
   deleteProduct?: Resolver<ResolversTypes['Product'], ParentType, ContextType, RequireFields<MutationDeleteProductArgs, 'input'>>;
+  deletePromotionCode?: Resolver<Maybe<ResolversTypes['PromotionCode']>, ParentType, ContextType, RequireFields<MutationDeletePromotionCodeArgs, 'input'>>;
   login?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationLoginArgs, 'input'>>;
   register?: Resolver<ResolversTypes['String'], ParentType, ContextType, RequireFields<MutationRegisterArgs, 'input'>>;
+  reportOrderIssue?: Resolver<ResolversTypes['Order'], ParentType, ContextType, RequireFields<MutationReportOrderIssueArgs, 'input'>>;
+  updateOrderStatus?: Resolver<ResolversTypes['Order'], ParentType, ContextType, RequireFields<MutationUpdateOrderStatusArgs, 'input'>>;
+  validatePromotionCode?: Resolver<ResolversTypes['PromotionDiscountResult'], ParentType, ContextType, RequireFields<MutationValidatePromotionCodeArgs, 'input'>>;
 };
 
 export type OrderResolvers<ContextType = any, ParentType extends ResolversParentTypes['Order'] = ResolversParentTypes['Order']> = {
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  allowedTransitions?: Resolver<Array<ResolversTypes['OrderStatus']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  customerEmail?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  customerName?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  customerPhone?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   delivery?: Resolver<ResolversTypes['Delivery'], ParentType, ContextType>;
   external_reference?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  issues?: Resolver<Array<ResolversTypes['OrderIssue']>, ParentType, ContextType>;
   items?: Resolver<Array<ResolversTypes['OrderItem']>, ParentType, ContextType>;
   mpInitPoint?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mpPreferenceId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   mpQrData?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  status?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  status?: Resolver<ResolversTypes['OrderStatus'], ParentType, ContextType>;
   updatedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   userId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type OrderIssueResolvers<ContextType = any, ParentType extends ResolversParentTypes['OrderIssue'] = ResolversParentTypes['OrderIssue']> = {
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  reason?: Resolver<ResolversTypes['OrderIssueReason'], ParentType, ContextType>;
+  reportedAt?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -455,6 +684,12 @@ export type OrderItemResolvers<ContextType = any, ParentType extends ResolversPa
   productId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   quantity?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PaymentConfigResolvers<ContextType = any, ParentType extends ResolversParentTypes['PaymentConfig'] = ResolversParentTypes['PaymentConfig']> = {
+  bypassPayment?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  mode?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -470,6 +705,7 @@ export type PaymentPreferenceResolvers<ContextType = any, ParentType extends Res
 
 export type ProductResolvers<ContextType = any, ParentType extends ResolversParentTypes['Product'] = ResolversParentTypes['Product']> = {
   _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  activeItemPrice?: Resolver<Maybe<ResolversTypes['ItemPrice']>, ParentType, ContextType>;
   category?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   details?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   image?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
@@ -479,12 +715,42 @@ export type ProductResolvers<ContextType = any, ParentType extends ResolversPare
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PromotionCodeResolvers<ContextType = any, ParentType extends ResolversParentTypes['PromotionCode'] = ResolversParentTypes['PromotionCode']> = {
+  _id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  code?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  fromDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  percentage?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  productId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  scope?: Resolver<ResolversTypes['PromotionScope'], ParentType, ContextType>;
+  toDate?: Resolver<ResolversTypes['DateTime'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PromotionDiscountResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['PromotionDiscountResult'] = ResolversParentTypes['PromotionDiscountResult']> = {
+  discountAmount?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  finalTotal?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  originalTotal?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  promotionCode?: Resolver<Maybe<ResolversTypes['PromotionCode']>, ParentType, ContextType>;
+  valid?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  activeItemPrice?: Resolver<Maybe<ResolversTypes['ItemPrice']>, ParentType, ContextType, RequireFields<QueryActiveItemPriceArgs, 'productId'>>;
+  availableProducts?: Resolver<Array<ResolversTypes['Product']>, ParentType, ContextType, Partial<QueryAvailableProductsArgs>>;
   categories?: Resolver<Array<ResolversTypes['Category']>, ParentType, ContextType>;
   category?: Resolver<ResolversTypes['Category'], ParentType, ContextType, RequireFields<QueryCategoryArgs, 'id'>>;
+  itemPrice?: Resolver<Maybe<ResolversTypes['ItemPrice']>, ParentType, ContextType, RequireFields<QueryItemPriceArgs, 'id'>>;
+  itemPrices?: Resolver<Array<ResolversTypes['ItemPrice']>, ParentType, ContextType>;
+  itemPricesByProduct?: Resolver<Array<ResolversTypes['ItemPrice']>, ParentType, ContextType, RequireFields<QueryItemPricesByProductArgs, 'productId'>>;
+  order?: Resolver<ResolversTypes['Order'], ParentType, ContextType, RequireFields<QueryOrderArgs, 'id'>>;
   orders?: Resolver<Array<ResolversTypes['Order']>, ParentType, ContextType>;
+  paymentConfig?: Resolver<ResolversTypes['PaymentConfig'], ParentType, ContextType>;
   product?: Resolver<ResolversTypes['Product'], ParentType, ContextType, RequireFields<QueryProductArgs, 'id'>>;
   products?: Resolver<Array<ResolversTypes['Product']>, ParentType, ContextType>;
+  promotionCode?: Resolver<Maybe<ResolversTypes['PromotionCode']>, ParentType, ContextType, RequireFields<QueryPromotionCodeArgs, 'id'>>;
+  promotionCodes?: Resolver<Array<ResolversTypes['PromotionCode']>, ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
@@ -492,11 +758,16 @@ export type Resolvers<ContextType = any> = {
   Category?: CategoryResolvers<ContextType>;
   DateTime?: GraphQLScalarType;
   Delivery?: DeliveryResolvers<ContextType>;
+  ItemPrice?: ItemPriceResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Order?: OrderResolvers<ContextType>;
+  OrderIssue?: OrderIssueResolvers<ContextType>;
   OrderItem?: OrderItemResolvers<ContextType>;
+  PaymentConfig?: PaymentConfigResolvers<ContextType>;
   PaymentPreference?: PaymentPreferenceResolvers<ContextType>;
   Product?: ProductResolvers<ContextType>;
+  PromotionCode?: PromotionCodeResolvers<ContextType>;
+  PromotionDiscountResult?: PromotionDiscountResultResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 };
 
