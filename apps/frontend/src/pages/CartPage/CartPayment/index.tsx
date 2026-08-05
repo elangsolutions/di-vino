@@ -1,10 +1,10 @@
+import { useMutation, useQuery } from "@apollo/client";
 import { useEffect, useRef, useState } from "react";
-import { useMutation } from "@apollo/client";
 import { Alert, Card, Space, Typography, Spin, Button, message, Input, Divider, Grid } from "antd";
 import { useSelector } from "react-redux";
 import { selectCartItems, selectCartTotal } from "../../../store/cart/slice";
 import { MERCADOPAGO_ENABLED } from "../../../config/payment";
-import { CREATE_PAYMENT_PREFERENCE } from "./queries";
+import { CREATE_PAYMENT_PREFERENCE, PAYMENT_CONFIG } from "./queries";
 import { VALIDATE_PROMOTION_CODE } from "../../../components/PromotionCode/queries";
 
 const { Title, Text } = Typography;
@@ -16,7 +16,11 @@ interface AppliedPromotion {
     finalTotal: number;
 }
 
-const CartPayment = () => {
+type CartPaymentProps = {
+    onBypassChange?: (bypass: boolean) => void;
+};
+
+const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
     const cartItems = useSelector(selectCartItems);
     const cartTotal = useSelector(selectCartTotal);
     const screens = useBreakpoint();
@@ -27,6 +31,13 @@ const CartPayment = () => {
     const [promoInput, setPromoInput] = useState("");
     const [appliedPromotion, setAppliedPromotion] = useState<AppliedPromotion | null>(null);
     const cartSignatureRef = useRef(`${cartItems.length}:${cartTotal}`);
+
+    const { data: configData, loading: configLoading } = useQuery(PAYMENT_CONFIG);
+    const bypassPayment = Boolean(configData?.paymentConfig?.bypassPayment);
+
+    useEffect(() => {
+        onBypassChange?.(bypassPayment);
+    }, [bypassPayment, onBypassChange]);
 
     const [validatePromotionCode, { loading: validatingPromo }] = useMutation(VALIDATE_PROMOTION_CODE);
     const [createPaymentPreference] = useMutation(CREATE_PAYMENT_PREFERENCE, {
@@ -44,18 +55,52 @@ const CartPayment = () => {
         },
     });
 
+    const finalTotal = appliedPromotion?.finalTotal ?? cartTotal;
+
+    const generateQR = async (amount = finalTotal, promoCode?: string) => {
+        setLoading(true);
+        const orderId = `order_${Date.now()}`;
+        const code = promoCode ?? appliedPromotion?.code;
+        const description = code
+            ? `Pedido - ${cartItems.length} items (${code})`
+            : `Pedido - ${cartItems.length} items`;
+
+        await createPaymentPreference({
+            variables: {
+                amount,
+                description,
+                orderId,
+            },
+        });
+    };
+
     useEffect(() => {
+        if (bypassPayment || configLoading) {
+            setQrCode(null);
+            setPaymentUrl(null);
+            return;
+        }
+
         const signature = `${cartItems.length}:${cartTotal}`;
         if (signature !== cartSignatureRef.current) {
             cartSignatureRef.current = signature;
             setAppliedPromotion(null);
-            setQrCode(null);
-            setPaymentUrl(null);
             setPromoInput("");
         }
-    }, [cartTotal, cartItems.length]);
 
-    const finalTotal = appliedPromotion?.finalTotal ?? cartTotal;
+        if (cartTotal > 0 && cartItems.length > 0) {
+            // Cart total is the source of truth here; promo is cleared above on cart change.
+            void generateQR(cartTotal);
+            return;
+        }
+
+        setQrCode(null);
+        setPaymentUrl(null);
+        setPromoInput("");
+        setAppliedPromotion(null);
+        // Intentionally omit generateQR: only regenerate when cart/config inputs change.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cartTotal, cartItems.length, bypassPayment, configLoading]);
 
     const buildCartItemsInput = () =>
         cartItems.map((item: any) => ({
@@ -113,21 +158,40 @@ const CartPayment = () => {
         setPaymentUrl(null);
     };
 
-    const generateQR = async () => {
-        setLoading(true);
-        const orderId = `order_${Date.now()}`;
-        const description = appliedPromotion
-            ? `Pedido - ${cartItems.length} items (${appliedPromotion.code})`
-            : `Pedido - ${cartItems.length} items`;
+    if (configLoading) {
+        return (
+            <div style={{ padding: "40px 20px", textAlign: "center" }}>
+                <Spin tip="Cargando configuración de pago..." />
+            </div>
+        );
+    }
 
-        await createPaymentPreference({
-            variables: {
-                amount: finalTotal,
-                description: description,
-                orderId: orderId,
-            },
-        });
-    };
+    if (bypassPayment) {
+        return (
+            <Alert
+                type="info"
+                showIcon
+                message="Modo testing — pago omitido"
+                description={
+                    <>
+                        <Text>
+                            El flujo de Mercado Pago está desactivado. Al confirmar el pedido se
+                            marcará como <Text strong>pagado</Text>. Continuá con entrega y
+                            contacto.
+                        </Text>
+                        {cartTotal > 0 && (
+                            <div style={{ marginTop: 12 }}>
+                                <Text strong style={{ color: "#5ea18b" }}>
+                                    Total del pedido: ${cartTotal.toLocaleString("es-AR")}
+                                </Text>
+                            </div>
+                        )}
+                    </>
+                }
+                style={{ maxWidth: 480, margin: "0 auto" }}
+            />
+        );
+    }
 
     if (!MERCADOPAGO_ENABLED) {
         return (

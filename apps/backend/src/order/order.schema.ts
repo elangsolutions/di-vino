@@ -78,6 +78,18 @@ export class Order extends Document {
     @Prop({ required: true })
     userId: string;
 
+    @Field({ nullable: true })
+    @Prop()
+    customerName?: string;
+
+    @Field({ nullable: true })
+    @Prop()
+    customerEmail?: string;
+
+    @Field({ nullable: true })
+    @Prop()
+    customerPhone?: string;
+
     @Field()
     @Prop({ default: 'pending_payment' })
     status: 'pending_payment' | 'paid' | 'cancelled';

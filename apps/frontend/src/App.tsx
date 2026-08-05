@@ -18,6 +18,7 @@ import ItemPriceForm from "./pages/AdminPage/ItemPrices/ItemPriceForm";
 import PromotionCodeListPage from "./pages/AdminPage/PromotionCodes/PromotionCodeList";
 import PromotionCodeForm from "./pages/AdminPage/PromotionCodes/PromotionCodeForm";
 import CartPage from "./pages/CartPage";
+import OrdersPage from "./pages/OrdersPage";
 
 
 const App = () => {
@@ -104,6 +105,7 @@ const App = () => {
                                 />
                             </Route>
                             <Route path='cart' element={<CartPage />}/>
+                            <Route path='orders' element={<OrdersPage />}/>
                         </Routes>
                     </Layout>
                 </Router>

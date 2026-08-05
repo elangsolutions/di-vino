@@ -1,12 +1,25 @@
-import { Resolver, Mutation, Args } from '@nestjs/graphql';
-import {PaymentPreference} from "./dto/types";
+import { Resolver, Mutation, Query, Args } from '@nestjs/graphql';
+import {PaymentConfig, PaymentPreference} from "./dto/types";
 import {PaymentService} from "./payment.service";
+import {ConfigService} from "../../config/config.service";
 
 
 
 @Resolver()
 export class PaymentResolver {
-    constructor(private readonly paymentService: PaymentService) {}
+    constructor(
+        private readonly paymentService: PaymentService,
+        private readonly configService: ConfigService,
+    ) {}
+
+    @Query(() => PaymentConfig)
+    paymentConfig(): PaymentConfig {
+        const mode = this.configService.paymentMode;
+        return {
+            mode,
+            bypassPayment: mode === 'testing',
+        };
+    }
 
     @Mutation(() => PaymentPreference)
     async createPaymentPreference(

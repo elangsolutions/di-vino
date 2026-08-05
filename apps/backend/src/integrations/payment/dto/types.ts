@@ -21,3 +21,13 @@ export class PaymentPreference {
     externalReference: string;
 }
 
+@ObjectType()
+export class PaymentConfig {
+    /** live | testing */
+    @Field()
+    mode: string;
+
+    @Field()
+    bypassPayment: boolean;
+}
+

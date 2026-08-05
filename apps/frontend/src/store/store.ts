@@ -2,6 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import cartReducer from './cart/slice.ts';
 import productsReducer from './product/slice.ts';
 import deliveryReducer from './delivery/slice.ts';
+import ordersReducer from './orders/slice.ts';
 import {loadState, saveState} from "./utils.ts";
 
 
@@ -12,6 +13,7 @@ export const store = configureStore({
         cart: cartReducer,
         productList: productsReducer,
         delivery: deliveryReducer,
+        orders: ordersReducer,
     } as any,
     preloadedState: preloadedState as any,
     devTools: process.env.NODE_ENV !== 'production',
@@ -22,6 +24,7 @@ store.subscribe(() => {
         cart: store.getState().cart,
         productList: store.getState().productList,
         delivery: store.getState().delivery,
+        orders: store.getState().orders,
     });
 });
 

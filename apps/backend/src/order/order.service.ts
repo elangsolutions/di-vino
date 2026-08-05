@@ -5,18 +5,27 @@ import { Model } from 'mongoose';
 import {CreateOrderDraftInput} from "./dto/create-order.input";
 import {ReportOrderIssueInput} from "./dto/report-order-issue.input";
 import {createOrderNumber} from "./utils";
+import {ConfigService} from "../config/config.service";
 
 @Injectable()
 export default class OrderService {
-    constructor(@InjectModel(Order.name) private orderModel: Model<Order>) {}
+    constructor(
+        @InjectModel(Order.name) private orderModel: Model<Order>,
+        private readonly configService: ConfigService,
+    ) {}
 
     async findAll() {
         return this.orderModel.find();
     }
 
+    async findById(id: string): Promise<Order | null> {
+        return this.orderModel.findById(id);
+    }
+
     async create(input: CreateOrderDraftInput): Promise<Order> {
         const external_reference = createOrderNumber();
-        const created = new this.orderModel({...input, status: 'pending_payment' , external_reference });
+        const status = this.configService.isPaymentTesting ? 'paid' : 'pending_payment';
+        const created = new this.orderModel({...input, status, external_reference });
         return created.save();
     }
 

@@ -1,2 +1,2 @@
-/** Flip to `true` when Mercado Pago is ready again. */
+/** Fallback when the paymentConfig query is unavailable. Prefer the GraphQL value. */
 export const MERCADOPAGO_ENABLED = true;
