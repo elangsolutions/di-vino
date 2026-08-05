@@ -21,20 +21,10 @@ import {
 } from '../../store/orders/slice';
 import ReportIssueModal, { issueReasonLabels } from './ReportIssueModal';
 import { GET_ORDER } from './queries';
+import { getOrderStatusMeta, pickupLocationNames } from '../../components/Order/constants';
 
 const { Title, Text } = Typography;
 const { Content, Header } = Layout;
-
-const pickupLocationNames: Record<string, string> = {
-    loc1: 'San Sebastian - Guardia',
-    loc2: 'El Canton - Guardia',
-};
-
-const statusMeta: Record<string, { color: string; label: string }> = {
-    pending_payment: { color: 'gold', label: 'Pendiente de pago' },
-    paid: { color: 'green', label: 'Pagado / en preparación' },
-    cancelled: { color: 'red', label: 'Cancelado' },
-};
 
 const formatCurrency = (value: number) =>
     new Intl.NumberFormat('es-AR', {
@@ -58,7 +48,7 @@ const OrderCard = ({
     onHide?: () => void;
     onRestore?: () => void;
 }) => {
-    const meta = statusMeta[order.status] ?? { color: 'default', label: order.status };
+    const meta = getOrderStatusMeta(order.status);
     const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const deliveryLabel =
         order.deliveryType === 'PICKUP'

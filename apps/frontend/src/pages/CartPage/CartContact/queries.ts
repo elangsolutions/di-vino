@@ -19,6 +19,8 @@ export const CREATE_ORDER = gql`
       delivery {
         type
         locationId
+        scheduledDate
+        timeSlot
       }
     }
   }

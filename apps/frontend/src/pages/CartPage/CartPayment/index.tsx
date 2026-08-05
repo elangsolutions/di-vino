@@ -325,7 +325,7 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
                         )}
                         <Button
                             type={isMobile ? "default" : "primary"}
-                            onClick={generateQR}
+                            onClick={() => void generateQR()}
                             style={{ width: '100%', height: 44 }}
                         >
                             Generar Nuevo QR
@@ -334,7 +334,7 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
                 ) : (
                     <Button
                         type="primary"
-                        onClick={generateQR}
+                        onClick={() => void generateQR()}
                         loading={loading}
                         style={{ width: '100%', height: 44 }}
                     >

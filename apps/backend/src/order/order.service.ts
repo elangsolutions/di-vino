@@ -1,9 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Order, OrderIssueReason } from './order.schema';
+import { Order, OrderIssueReason, OrderStatus, ORDER_STATUS_TRANSITIONS } from './order.schema';
 import { Model } from 'mongoose';
 import {CreateOrderDraftInput} from "./dto/create-order.input";
 import {ReportOrderIssueInput} from "./dto/report-order-issue.input";
+import {UpdateOrderStatusInput} from "./dto/update-order-status.input";
 import {createOrderNumber} from "./utils";
 import {ConfigService} from "../config/config.service";
 
@@ -15,7 +16,7 @@ export default class OrderService {
     ) {}
 
     async findAll() {
-        return this.orderModel.find();
+        return this.orderModel.find().sort({ createdAt: -1 });
     }
 
     async findById(id: string): Promise<Order | null> {
@@ -24,9 +25,32 @@ export default class OrderService {
 
     async create(input: CreateOrderDraftInput): Promise<Order> {
         const external_reference = createOrderNumber();
-        const status = this.configService.isPaymentTesting ? 'paid' : 'pending_payment';
+        const status = this.configService.isPaymentTesting
+            ? OrderStatus.PAID
+            : OrderStatus.PENDING_PAYMENT;
         const created = new this.orderModel({...input, status, external_reference });
         return created.save();
+    }
+
+    async updateStatus(input: UpdateOrderStatusInput): Promise<Order> {
+        const order = await this.orderModel.findById(input.orderId);
+        if (!order) {
+            throw new NotFoundException('Pedido no encontrado');
+        }
+
+        if (order.status === input.status) {
+            return order;
+        }
+
+        const allowed = ORDER_STATUS_TRANSITIONS[order.status] ?? [];
+        if (!allowed.includes(input.status)) {
+            throw new BadRequestException(
+                `No se puede pasar el pedido de "${order.status}" a "${input.status}"`,
+            );
+        }
+
+        order.status = input.status;
+        return order.save();
     }
 
     async reportIssue(input: ReportOrderIssueInput): Promise<Order> {

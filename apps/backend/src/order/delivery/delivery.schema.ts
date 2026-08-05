@@ -23,4 +23,12 @@ export class Delivery {
     @Field(() => Address, { nullable: true })
     @Prop()
     address?: Address;
+
+    @Field(() => Date, { nullable: true })
+    @Prop()
+    scheduledDate?: Date;
+
+    @Field({ nullable: true })
+    @Prop()
+    timeSlot?: string;
 }

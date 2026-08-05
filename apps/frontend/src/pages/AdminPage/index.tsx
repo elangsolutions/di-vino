@@ -16,6 +16,7 @@ const AdminPage = () => {
                     selectedKeys={[location.pathname.split("/")[2] || "products"]}
                     onClick={({ key }) => navigate(`/admin/${key}`)}
                 >
+                    <Menu.Item key="orders">Pedidos</Menu.Item>
                     <Menu.Item key="products">Productos</Menu.Item>
                     <Menu.Item key="categories">Categorías</Menu.Item>
                     <Menu.Item key="item-prices">Precios</Menu.Item>

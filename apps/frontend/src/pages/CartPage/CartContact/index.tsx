@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button, Form, Input, Typography, Space } from 'antd';
+import dayjs from 'dayjs';
 import { useForm, Controller } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
 import { useDispatch, useSelector } from 'react-redux';
@@ -19,6 +20,17 @@ interface ContactFormData {
 
 type CartContactProps = {
     onCompleted: () => void;
+};
+
+/** Folds the chosen time slot ("16:00") into the chosen day so the backend gets one instant. */
+const toScheduledDate = (date: string | null, time: string | null) => {
+    if (!date) return null;
+    const day = dayjs(date);
+    if (!day.isValid()) return null;
+    if (!time) return day.startOf('day').toISOString();
+
+    const [hours, minutes] = time.split(':').map(Number);
+    return day.hour(hours).minute(minutes).second(0).millisecond(0).toISOString();
 };
 
 const CartContact = ({ onCompleted }: CartContactProps) => {
@@ -54,12 +66,13 @@ const CartContact = ({ onCompleted }: CartContactProps) => {
                 return;
             }
 
-            const deliveryType = delivery.deliveryType === 'pickup' ? 'PICKUP' : 'ADDRESS';
+            const isPickup = delivery.deliveryType === 'pickup';
+            const deliveryType = isPickup ? 'PICKUP' : 'ADDRESS';
+            const { date, time } = isPickup ? delivery.pickup : delivery.delivery;
 
             const { data } = await createOrder({
                 variables: {
                     input: {
-                        state: 'OPEN',
                         userId: formData.customerEmail,
                         customerName: formData.customerName.trim(),
                         customerEmail: formData.customerEmail.trim(),
@@ -68,15 +81,16 @@ const CartContact = ({ onCompleted }: CartContactProps) => {
                         delivery: {
                             type: deliveryType,
                             locationId: delivery.pickup.locationId || null,
-                            address:
-                                delivery.deliveryType === 'delivery'
-                                    ? {
-                                          street: delivery.delivery.street,
-                                          city: delivery.delivery.city,
-                                          postalCode: delivery.delivery.zip,
-                                          province: '',
-                                      }
-                                    : null,
+                            scheduledDate: toScheduledDate(date, time),
+                            timeSlot: time,
+                            address: isPickup
+                                ? null
+                                : {
+                                      street: delivery.delivery.street,
+                                      city: delivery.delivery.city,
+                                      postalCode: delivery.delivery.zip,
+                                      province: '',
+                                  },
                         },
                     },
                 },

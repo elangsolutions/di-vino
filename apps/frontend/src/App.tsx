@@ -17,6 +17,7 @@ import ItemPriceListPage from "./pages/AdminPage/ItemPrices/ItemPriceList";
 import ItemPriceForm from "./pages/AdminPage/ItemPrices/ItemPriceForm";
 import PromotionCodeListPage from "./pages/AdminPage/PromotionCodes/PromotionCodeList";
 import PromotionCodeForm from "./pages/AdminPage/PromotionCodes/PromotionCodeForm";
+import AdminOrderListPage from "./pages/AdminPage/Orders/OrderList";
 import CartPage from "./pages/CartPage";
 import OrdersPage from "./pages/OrdersPage";
 
@@ -40,6 +41,7 @@ const App = () => {
                                 }
                             >
                                 <Route index element={<Navigate to="products" replace/>}/>
+                                <Route path="orders" element={<AdminOrderListPage/>}/>
                                 <Route path="products" element={<ProductListPage/>}/>
                                 <Route
                                     path="/admin/add"

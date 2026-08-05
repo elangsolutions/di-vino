@@ -1,9 +1,10 @@
-import {Resolver, Mutation, Args, Query} from '@nestjs/graphql';
+import {Resolver, Mutation, Args, Query, ResolveField, Parent} from '@nestjs/graphql';
 import { NotFoundException } from '@nestjs/common';
-import { Order } from './order.schema';
+import { Order, OrderStatus, ORDER_STATUS_TRANSITIONS } from './order.schema';
 import OrderService from './order.service';
 import {CreateOrderDraftInput} from "./dto/create-order.input";
 import {ReportOrderIssueInput} from "./dto/report-order-issue.input";
+import {UpdateOrderStatusInput} from "./dto/update-order-status.input";
 
 
 @Resolver(() => Order)
@@ -31,5 +32,16 @@ export class OrderResolver {
     @Mutation(() => Order)
     async reportOrderIssue(@Args('input') input: ReportOrderIssueInput): Promise<Order> {
         return this.orderService.reportIssue(input);
+    }
+
+    @Mutation(() => Order)
+    async updateOrderStatus(@Args('input') input: UpdateOrderStatusInput): Promise<Order> {
+        return this.orderService.updateStatus(input);
+    }
+
+    /** Lets the admin UI offer only the transitions the backend would accept. */
+    @ResolveField(() => [OrderStatus])
+    allowedTransitions(@Parent() order: Order): OrderStatus[] {
+        return ORDER_STATUS_TRANSITIONS[order.status] ?? [];
     }
 }
