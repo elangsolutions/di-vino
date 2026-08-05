@@ -116,6 +116,7 @@ type Mutation {
   deletePromotionCode(input: RemovePromotionCodeInput!): PromotionCode
   login(input: LoginInput!): String!
   register(input: RegisterInput!): String!
+  reportOrderIssue(input: ReportOrderIssueInput!): Order!
   validatePromotionCode(input: ValidatePromotionCodeInput!): PromotionDiscountResult!
 }
 
@@ -124,6 +125,7 @@ type Order {
   createdAt: DateTime!
   delivery: Delivery!
   external_reference: String!
+  issues: [OrderIssue!]!
   items: [OrderItem!]!
   mpInitPoint: String
   mpPreferenceId: String
@@ -131,6 +133,19 @@ type Order {
   status: String!
   updatedAt: DateTime!
   userId: String!
+}
+
+type OrderIssue {
+  message: String
+  reason: OrderIssueReason!
+  reportedAt: DateTime!
+}
+
+enum OrderIssueReason {
+  CANCEL
+  DATE_CHANGE
+  OTHER
+  OTHER_RECIPIENT
 }
 
 type OrderItem {
@@ -239,6 +254,12 @@ input RemoveProductInput {
 
 input RemovePromotionCodeInput {
   _id: String!
+}
+
+input ReportOrderIssueInput {
+  message: String
+  orderId: String!
+  reason: OrderIssueReason!
 }
 
 input ValidatePromotionCodeInput {
