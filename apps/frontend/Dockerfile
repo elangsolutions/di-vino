@@ -10,8 +10,13 @@ WORKDIR /app
 ARG VITE_API_URL
 ENV VITE_API_URL=$VITE_API_URL
 
+# Railway injects NODE_ENV=production into the build. Yarn then skips
+# devDependencies (typescript, vite, …) and `yarn build` fails. Force a full install
+# for the build stage only.
+ENV NODE_ENV=development
+
 COPY package.json yarn.lock ./
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --production=false
 
 COPY . .
 RUN yarn build
