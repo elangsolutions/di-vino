@@ -1,6 +1,6 @@
 import {FC, useEffect, useState, useMemo} from 'react';
-import {Alert, Badge, Layout, Row, Spin, Typography, Slider, Button, Space, Tabs} from 'antd';
-import {ShoppingCartOutlined, UnorderedListOutlined} from '@ant-design/icons';
+import {Alert, Badge, Layout, Row, Spin, Typography, Slider, Button, Space, Tabs, Input} from 'antd';
+import {SearchOutlined, ShoppingCartOutlined, UnorderedListOutlined} from '@ant-design/icons';
 import './index.css';
 import ProductCard from "./Products/ProductCard";
 import {useGetAvailableProducts} from "../../components/Product/hooks/useGetAvailableProducts.ts";
@@ -32,6 +32,7 @@ const LandingPage: FC = () => {
     const ongoingOrders = useSelector(selectOngoingOrders);
 
     const [category, setCategory] = useState<string>('all');
+    const [search, setSearch] = useState('');
     // null = no price filter applied yet; the slider still shows the full computed range.
     const [priceRange, setPriceRange] = useState<[number, number] | null>(null);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -79,6 +80,8 @@ const LandingPage: FC = () => {
     const isPriceFiltered = priceRange != null
         && (priceRange[0] > priceBounds[0] || priceRange[1] < priceBounds[1]);
 
+    const normalizedSearch = search.trim().toLowerCase();
+
     const filteredProducts = useMemo(() => {
         return products.filter((p: Product) => {
             const itemPrice = p.activeItemPrice?.price;
@@ -92,9 +95,16 @@ const LandingPage: FC = () => {
                 return false;
             }
 
+            if (normalizedSearch) {
+                const haystack = `${p.name} ${p.details ?? ''} ${p.category}`.toLowerCase();
+                if (!haystack.includes(normalizedSearch)) {
+                    return false;
+                }
+            }
+
             return true;
         });
-    }, [products, category, activePriceRange]);
+    }, [products, category, activePriceRange, normalizedSearch]);
 
     const categoryTabs = useMemo(
         () => [
@@ -192,6 +202,15 @@ const LandingPage: FC = () => {
                     />
 
                     <div className="price-filter">
+                        <Input
+                            allowClear
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                            placeholder="Buscar producto..."
+                            prefix={<SearchOutlined style={{color: '#5ea18b'}} />}
+                            className="catalog-search"
+                            aria-label="Buscar producto"
+                        />
                         <div className="price-filter-header">
                             <Text type="secondary" style={{fontSize: 13}}>
                                 Precio:{' '}
