@@ -69,6 +69,16 @@
     padding: 0 4px;
 }
 
+.catalog-search {
+    margin-bottom: 12px;
+}
+
+.catalog-search.ant-input-affix-wrapper:focus,
+.catalog-search.ant-input-affix-wrapper-focused {
+    border-color: #5ea18b;
+    box-shadow: 0 0 0 2px rgba(94, 161, 139, 0.15);
+}
+
 .price-filter-header {
     display: flex;
     align-items: center;
