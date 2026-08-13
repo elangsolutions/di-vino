@@ -20,9 +20,9 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
     const dispatch = useDispatch();
     const quantity = useSelector((state: RootState) => state.cart.quantities[product._id] || 0);
 
-    const handleIncrement = (e: React.MouseEvent) => {
+    const handleIncrement = (e: React.MouseEvent, amount = 1) => {
         e.stopPropagation();
-        dispatch(increment({productId: product._id}));
+        dispatch(increment({productId: product._id, amount}));
     };
 
     const handleDecrement = (e: React.MouseEvent) => {
@@ -66,16 +66,31 @@ const ProductCard: (props: ProductCardProps) => JSX.Element = (props: ProductCar
                     </>
                 }
             />
-            <Space className="product-card-actions" style={{marginTop: 12, display: 'flex', width: '100%'}}>
-                <Button
-                    size="large"
-                    icon={<MinusOutlined/>}
-                    onClick={handleDecrement}
-                    disabled={quantity === 0}
-                />
-                <span style={{minWidth: 20, textAlign: 'center', display: 'inline-block'}}>{quantity}</span>
-                <Button size="large" type={'primary'} icon={<PlusOutlined/>} onClick={handleIncrement}/>
-            </Space>
+            <div className="product-card-actions" style={{marginTop: 12, width: '100%'}}>
+                <Space style={{display: 'flex', width: '100%'}}>
+                    <Button
+                        size="large"
+                        icon={<MinusOutlined/>}
+                        onClick={handleDecrement}
+                        disabled={quantity === 0}
+                    />
+                    <span style={{minWidth: 20, textAlign: 'center', display: 'inline-block'}}>{quantity}</span>
+                    <Button
+                        size="large"
+                        type="primary"
+                        icon={<PlusOutlined/>}
+                        onClick={(e) => handleIncrement(e)}
+                    />
+                </Space>
+                <Space size={8} style={{marginTop: 8, display: 'flex', width: '100%'}}>
+                    <Button size="small" onClick={(e) => handleIncrement(e, 6)}>
+                        +6
+                    </Button>
+                    <Button size="small" onClick={(e) => handleIncrement(e, 10)}>
+                        +10
+                    </Button>
+                </Space>
+            </div>
         </Card>
         <ProductCardModal isOpen={isOpen} close={close} product={product}/>
     </Col>
