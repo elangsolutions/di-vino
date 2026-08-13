@@ -4,6 +4,8 @@ import {MinusOutlined, PlusOutlined, DeleteOutlined} from '@ant-design/icons';
 import {useSelector} from "react-redux";
 import {getProductImage, priceFormat} from "../../../utils";
 import {RootState} from "../../../store/store";
+import {useEvaluatePromotions} from "../../../components/Promotion/useEvaluatePromotions";
+import {describeApplication} from "../../../components/Promotion/utils";
 
 interface CartProps {
     onIncrease: (id: string) => void;
@@ -17,6 +19,7 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
         productList: state.productList,
         cart: state.cart,
     }));
+    const {evaluation} = useEvaluatePromotions();
 
     const cartWithDetails = useMemo(() => {
         return Object.entries(cart.quantities)
@@ -38,7 +41,9 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
             }[];
     }, [productList, cart])
 
-    const total = cartWithDetails.reduce((sum, p) => sum + p.price * p.quantity, 0);
+    const subtotal = cartWithDetails.reduce((sum, p) => sum + p.price * p.quantity, 0);
+    const discountAmount = evaluation.discountAmount || 0;
+    const total = Math.max(0, subtotal - discountAmount);
 
     if (cartWithDetails.length === 0) {
         return (
@@ -111,6 +116,23 @@ const CartList: React.FC<CartProps> = ({onIncrease, onDecrease, onRemove}) => {
                     </div>
                 </div>
             ))}
+            {evaluation.applications.length > 0 && (
+                <div style={{padding: '12px 4px 0'}}>
+                    {evaluation.applications.map((application) => (
+                        <div
+                            key={application.promotion._id}
+                            style={{display: 'flex', justifyContent: 'space-between', gap: 8, marginBottom: 4}}
+                        >
+                            <Typography.Text type="success">
+                                {application.promotion.name}: {describeApplication(application)}
+                            </Typography.Text>
+                            <Typography.Text type="success">
+                                -${priceFormat(application.discountAmount)}
+                            </Typography.Text>
+                        </div>
+                    ))}
+                </div>
+            )}
             <Divider style={{margin: '12px 0'}}/>
             <div style={{display: 'flex', justifyContent: 'flex-end'}}>
                 <Typography.Title level={5} style={{margin: 0}}>

@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { ObjectType, Field, ID } from '@nestjs/graphql';
+import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
 
 @ObjectType()
 @Schema()
@@ -26,6 +26,10 @@ export class Product extends Document {
   @Field()
   @Prop()
   category: string;
+
+  @Field(() => Int, { nullable: true })
+  @Prop({ min: 1 })
+  unitsPerBulk?: number;
 
   @Field()
   @Prop()

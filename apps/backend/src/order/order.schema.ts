@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { ObjectType, Field, ID, InputType, registerEnumType } from '@nestjs/graphql';
+import { ObjectType, Field, ID, InputType, Float, registerEnumType } from '@nestjs/graphql';
 import { Document } from 'mongoose';
 import {Delivery, DeliveryType} from "./delivery/delivery.schema";
 import {AddAddressInput} from "../user/address/dto/add-address.input";
@@ -145,6 +145,10 @@ export class Order extends Document {
     @Field(() => [OrderIssue])
     @Prop({ type: [OrderIssue], default: [] })
     issues: OrderIssue[];
+
+    @Field(() => Float, { nullable: true })
+    @Prop({ default: 0 })
+    discountAmount?: number;
 
     @Field()
     createdAt: Date;

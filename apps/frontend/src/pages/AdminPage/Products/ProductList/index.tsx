@@ -76,6 +76,9 @@ const ProductListPage = () => {
                                         : 'Sin precio vigente'}
                                 </p>
                                 <p>Categoria: {product.category}</p>
+                                {product.unitsPerBulk ? (
+                                    <p>Unidades por bulto: {product.unitsPerBulk}</p>
+                                ) : null}
 
                                 <p>{product.details}</p>
                                 <p>{product.image ? (

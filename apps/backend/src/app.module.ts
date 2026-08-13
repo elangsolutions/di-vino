@@ -14,7 +14,7 @@ import {ProductModule} from "./product/product.module";
 import {CategoryModule} from "./category/category.module";
 import {ItemPriceModule} from "./item-price/item-price.module";
 import {PaymentModule} from "./integrations/payment/payment.module";
-import {PromotionCodeModule} from "./promotion-code/promotion-code.module";
+import {PromotionModule} from "./promotion/promotion.module";
 import * as process from "node:process";
 
 @Module({
@@ -52,7 +52,7 @@ import * as process from "node:process";
     CategoryModule,
     ItemPriceModule,
     PaymentModule,
-    PromotionCodeModule,
+    PromotionModule,
   ],
   providers: [AppService],
 })

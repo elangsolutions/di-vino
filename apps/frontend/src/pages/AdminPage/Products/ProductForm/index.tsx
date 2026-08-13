@@ -1,4 +1,4 @@
-import {Button, Form, Input, Select, Space} from "antd";
+import {Button, Form, Input, InputNumber, Select, Space} from "antd";
 import {useForm, Controller} from "react-hook-form";
 import {useMutation, useQuery} from "@apollo/client";
 import {ADD_PRODUCT, GET_PRODUCT} from "../../../../components/Product/queries.ts";
@@ -12,10 +12,13 @@ interface ProductFormData {
     details: string;
     category: string;
     image?: string;
+    unitsPerBulk?: number;
 }
 
 const ProductForm = ({productId}: { productId?: string }) => {
-    const {control, handleSubmit, reset} = useForm<ProductFormData>();
+    const {control, handleSubmit, reset} = useForm<ProductFormData>({
+        defaultValues: { unitsPerBulk: 6 },
+    });
     const navigate = useNavigate();
     const [addProduct, {loading}] = useMutation(ADD_PRODUCT);
     const [imagePreview, setImagePreview] = useState<string | undefined>(undefined);
@@ -35,6 +38,7 @@ const ProductForm = ({productId}: { productId?: string }) => {
                 details: data.product.details,
                 category: data.product.category,
                 image: data.product.image,
+                unitsPerBulk: data.product.unitsPerBulk ?? 6,
             });
             if (data.product.image) {
                 setImagePreview(data.product.image);
@@ -53,6 +57,7 @@ const ProductForm = ({productId}: { productId?: string }) => {
                         details: formData.details,
                         category: formData.category,
                         image: formData.image || null,
+                        unitsPerBulk: formData.unitsPerBulk || null,
                     },
                 },
             });
@@ -96,6 +101,20 @@ const ProductForm = ({productId}: { productId?: string }) => {
                                 </Select.Option>
                             ))}
                         </Select>
+                    )}
+                />
+            </Form.Item>
+
+            <Form.Item
+                label="Unidades por bulto / caja"
+                extra="Se usa en promociones por volumen. Ejemplo: 6 vinos por caja."
+            >
+                <Controller
+                    name="unitsPerBulk"
+                    control={control}
+                    rules={{ min: { value: 1, message: "Debe ser al menos 1" } }}
+                    render={({field}) => (
+                        <InputNumber {...field} min={1} style={{width: "100%"}} />
                     )}
                 />
             </Form.Item>

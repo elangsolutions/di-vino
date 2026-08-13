@@ -8,6 +8,7 @@ export const GET_PRODUCTS = gql`
       details
       category
       image
+      unitsPerBulk
       activeItemPrice {
         _id
         price
@@ -27,6 +28,7 @@ export const GET_AVAILABLE_PRODUCTS = gql`
       details
       category
       image
+      unitsPerBulk
       activeItemPrice {
         _id
         price
@@ -48,6 +50,7 @@ export const ADD_PRODUCT = gql`
       category
       price
       image
+      unitsPerBulk
     }
   }
 `;
@@ -61,6 +64,7 @@ export const GET_PRODUCT = gql`
       category
       details
       image
+      unitsPerBulk
     }
   }
 `;

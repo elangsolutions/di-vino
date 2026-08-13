@@ -1,10 +1,12 @@
-import { Button, Modal, Space, Typography } from "antd";
+import { Button, Modal, Typography } from "antd";
 import { MinusOutlined, PlusOutlined } from "@ant-design/icons";
 import { useDispatch, useSelector } from "react-redux";
 import { Product } from "../../../../generated/graphql.ts";
 import { RootState } from "../../../../store/store";
 import { decrement, increment } from "../../../../store/cart/slice.ts";
 import { getProductImage, priceFormat } from "../../../../utils";
+import { describeCatalogOffer, Promotion } from "../../../../components/Promotion/utils";
+import "../ProductCard/styles.css";
 import "./styles.css";
 
 const { Title, Text } = Typography;
@@ -13,11 +15,16 @@ type ProductCardModalProps = {
     isOpen: boolean;
     close: () => void;
     product: Product;
+    bulkPromotion?: Promotion;
+    productPromotion?: Promotion;
 };
 
-const ProductCardModal = ({ isOpen, close, product }: ProductCardModalProps) => {
+const ProductCardModal = ({ isOpen, close, product, bulkPromotion, productPromotion }: ProductCardModalProps) => {
     const dispatch = useDispatch();
     const quantity = useSelector((state: RootState) => state.cart.quantities[product._id] || 0);
+    const unitsPerBulk = product.unitsPerBulk && product.unitsPerBulk >= 2
+        ? product.unitsPerBulk
+        : undefined;
 
     return (
         <Modal
@@ -41,26 +48,53 @@ const ProductCardModal = ({ isOpen, close, product }: ProductCardModalProps) => 
                         ${priceFormat(product.activeItemPrice.price)}.-
                     </Text>
                 )}
+                {productPromotion && (
+                    <Text style={{ display: 'block', color: '#5ea18b' }}>
+                        {describeCatalogOffer(productPromotion)}
+                    </Text>
+                )}
+                {bulkPromotion && (
+                    <Text style={{ display: 'block', color: '#5ea18b' }}>
+                        {describeCatalogOffer(bulkPromotion)}
+                    </Text>
+                )}
                 {product.details && (
                     <p className="product-modal-details">{product.details}</p>
                 )}
-                <Space style={{ marginTop: 16 }}>
-                    <Button
-                        size="large"
-                        icon={<MinusOutlined />}
-                        onClick={() => dispatch(decrement({ productId: product._id }))}
-                        disabled={quantity === 0}
-                    />
-                    <Text strong style={{ fontSize: 16, minWidth: 24, display: 'inline-block' }}>
-                        {quantity}
-                    </Text>
-                    <Button
-                        size="large"
-                        type="primary"
-                        icon={<PlusOutlined />}
-                        onClick={() => dispatch(increment({ productId: product._id }))}
-                    />
-                </Space>
+                <div className="product-card-actions">
+                    <div className="product-card-qty">
+                        <Button
+                            size="small"
+                            icon={<MinusOutlined />}
+                            onClick={() => dispatch(decrement({ productId: product._id }))}
+                            disabled={quantity === 0}
+                        />
+                        <span className="product-card-qty-value">{quantity}</span>
+                        <Button
+                            size="small"
+                            type="primary"
+                            icon={<PlusOutlined />}
+                            onClick={() => dispatch(increment({ productId: product._id }))}
+                        />
+                    </div>
+                    {unitsPerBulk ? (
+                        <div className="product-card-cajas">
+                            <Button
+                                size="small"
+                                onClick={() => dispatch(decrement({ productId: product._id, amount: unitsPerBulk }))}
+                                disabled={quantity === 0}
+                            >
+                                -Cajas
+                            </Button>
+                            <Button
+                                size="small"
+                                onClick={() => dispatch(increment({ productId: product._id, amount: unitsPerBulk }))}
+                            >
+                                +Cajas
+                            </Button>
+                        </div>
+                    ) : null}
+                </div>
             </div>
         </Modal>
     );

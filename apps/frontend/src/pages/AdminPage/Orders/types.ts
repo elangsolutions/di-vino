@@ -41,10 +41,13 @@ export interface Order {
     items: OrderItem[];
     delivery: OrderDelivery;
     issues: OrderIssue[];
+    discountAmount?: number | null;
 }
 
-export const orderTotal = (order: Order) =>
-    order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+export const orderTotal = (order: Order) => {
+    const itemsTotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    return Math.max(0, itemsTotal - (order.discountAmount || 0));
+};
 
 export const formatCurrency = (value: number) =>
     new Intl.NumberFormat('es-AR', {

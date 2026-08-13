@@ -17,6 +17,7 @@ export const ORDER_FIELDS = gql`
       price
       quantity
     }
+    discountAmount
     delivery {
       type
       locationId

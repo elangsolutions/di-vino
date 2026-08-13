@@ -5,7 +5,9 @@ import { useSelector } from "react-redux";
 import { selectCartItems, selectCartTotal } from "../../../store/cart/slice";
 import { MERCADOPAGO_ENABLED } from "../../../config/payment";
 import { CREATE_PAYMENT_PREFERENCE, PAYMENT_CONFIG } from "./queries";
-import { VALIDATE_PROMOTION_CODE } from "../../../components/PromotionCode/queries";
+import { VALIDATE_PROMOTION_CODE } from "../../../components/Promotion/queries";
+import { useEvaluatePromotions } from "../../../components/Promotion/useEvaluatePromotions";
+import { describeApplication } from "../../../components/Promotion/utils";
 
 const { Title, Text } = Typography;
 const { useBreakpoint } = Grid;
@@ -23,6 +25,7 @@ type CartPaymentProps = {
 const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
     const cartItems = useSelector(selectCartItems);
     const cartTotal = useSelector(selectCartTotal);
+    const { evaluation: promoEvaluation } = useEvaluatePromotions();
     const screens = useBreakpoint();
     const isMobile = !screens.md;
     const [qrCode, setQrCode] = useState<string | null>(null);
@@ -55,7 +58,11 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
         },
     });
 
-    const finalTotal = appliedPromotion?.finalTotal ?? cartTotal;
+    const autoDiscount = Number(promoEvaluation.discountAmount) || 0;
+    const totalAfterAuto = Math.max(0, cartTotal - autoDiscount);
+    const finalTotal = appliedPromotion
+        ? Math.max(0, totalAfterAuto - appliedPromotion.discountAmount)
+        : totalAfterAuto;
 
     const generateQR = async (amount = finalTotal, promoCode?: string) => {
         setLoading(true);
@@ -81,7 +88,7 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
             return;
         }
 
-        const signature = `${cartItems.length}:${cartTotal}`;
+        const signature = `${cartItems.length}:${cartTotal}:${autoDiscount}`;
         if (signature !== cartSignatureRef.current) {
             cartSignatureRef.current = signature;
             setAppliedPromotion(null);
@@ -89,8 +96,7 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
         }
 
         if (cartTotal > 0 && cartItems.length > 0) {
-            // Cart total is the source of truth here; promo is cleared above on cart change.
-            void generateQR(cartTotal);
+            void generateQR(totalAfterAuto);
             return;
         }
 
@@ -100,7 +106,7 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
         setAppliedPromotion(null);
         // Intentionally omit generateQR: only regenerate when cart/config inputs change.
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cartTotal, cartItems.length, bypassPayment, configLoading]);
+    }, [cartTotal, cartItems.length, autoDiscount, bypassPayment, configLoading]);
 
     const buildCartItemsInput = () =>
         cartItems.map((item: any) => ({
@@ -135,12 +141,12 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
             }
 
             const discountAmount = Number(result.discountAmount) || 0;
-            const nextFinalTotal = Number(result.finalTotal);
+            const nextFinalTotal = Math.max(0, totalAfterAuto - discountAmount);
 
             setAppliedPromotion({
-                code: (result.promotionCode?.code || promoInput).trim().toUpperCase(),
+                code: (result.promotion?.code || promoInput).trim().toUpperCase(),
                 discountAmount,
-                finalTotal: Number.isFinite(nextFinalTotal) ? nextFinalTotal : Math.max(0, cartTotal - discountAmount),
+                finalTotal: nextFinalTotal,
             });
             setQrCode(null);
             setPaymentUrl(null);
@@ -181,8 +187,15 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
                         </Text>
                         {cartTotal > 0 && (
                             <div style={{ marginTop: 12 }}>
+                                {autoDiscount > 0 && (
+                                    <div style={{ marginBottom: 4 }}>
+                                        <Text type="success">
+                                            Promociones: -${autoDiscount.toLocaleString("es-AR")}
+                                        </Text>
+                                    </div>
+                                )}
                                 <Text strong style={{ color: "#5ea18b" }}>
-                                    Total del pedido: ${cartTotal.toLocaleString("es-AR")}
+                                    Total del pedido: ${finalTotal.toLocaleString("es-AR")}
                                 </Text>
                             </div>
                         )}
@@ -243,6 +256,17 @@ const CartPayment = ({ onBypassChange }: CartPaymentProps) => {
                         <Text>Subtotal</Text>
                         <Text>${cartTotal.toLocaleString('es-AR')}</Text>
                     </div>
+                    {promoEvaluation.applications.map((application) => (
+                        <div
+                            key={application.promotion._id}
+                            style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}
+                        >
+                            <Text type="success">
+                                {application.promotion.name} ({describeApplication(application)})
+                            </Text>
+                            <Text type="success">-${application.discountAmount.toLocaleString('es-AR')}</Text>
+                        </div>
+                    ))}
                     {appliedPromotion && (
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
                             <Text type="success">Descuento ({appliedPromotion.code})</Text>

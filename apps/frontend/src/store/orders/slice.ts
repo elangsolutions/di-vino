@@ -24,6 +24,7 @@ export type OngoingOrder = {
     locationId?: string | null;
     items: OngoingOrderItem[];
     createdAt: string;
+    discountAmount?: number | null;
     hidden?: boolean;
     issue?: OngoingOrderIssue | null;
 };

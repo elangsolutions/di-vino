@@ -7,12 +7,14 @@ import {ReportOrderIssueInput} from "./dto/report-order-issue.input";
 import {UpdateOrderStatusInput} from "./dto/update-order-status.input";
 import {createOrderNumber} from "./utils";
 import {ConfigService} from "../config/config.service";
+import {PromotionService} from "../promotion/promotion.service";
 
 @Injectable()
 export default class OrderService {
     constructor(
         @InjectModel(Order.name) private orderModel: Model<Order>,
         private readonly configService: ConfigService,
+        private readonly promotionService: PromotionService,
     ) {}
 
     async findAll() {
@@ -28,7 +30,19 @@ export default class OrderService {
         const status = this.configService.isPaymentTesting
             ? OrderStatus.PAID
             : OrderStatus.PENDING_PAYMENT;
-        const created = new this.orderModel({...input, status, external_reference });
+        const promotionEvaluation = await this.promotionService.evaluate(
+            input.items.map((item) => ({
+                productId: item.productId,
+                quantity: Math.max(0, Math.floor(item.quantity)),
+                price: item.price,
+            })),
+        );
+        const created = new this.orderModel({
+            ...input,
+            status,
+            external_reference,
+            discountAmount: promotionEvaluation.discountAmount,
+        });
         return created.save();
     }
 

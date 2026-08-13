@@ -6,6 +6,7 @@ export interface Product {
     description?: string;
     image?: string;
     category: string;
+    unitsPerBulk?: number | null;
     activeItemPrice?: {
         _id: string;
         price: number;

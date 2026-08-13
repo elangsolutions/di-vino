@@ -49,7 +49,8 @@ const OrderCard = ({
     onRestore?: () => void;
 }) => {
     const meta = getOrderStatusMeta(order.status);
-    const total = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const itemsTotal = order.items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const total = Math.max(0, itemsTotal - (order.discountAmount || 0));
     const deliveryLabel =
         order.deliveryType === 'PICKUP'
             ? `Retiro: ${pickupLocationNames[order.locationId ?? ''] ?? 'Punto de retiro'}`
@@ -104,6 +105,12 @@ const OrderCard = ({
                         <Text>{formatCurrency(item.price * item.quantity)}</Text>
                     </div>
                 ))}
+                {Boolean(order.discountAmount) && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8 }}>
+                        <Text type="success">Promociones</Text>
+                        <Text type="success">-{formatCurrency(order.discountAmount || 0)}</Text>
+                    </div>
+                )}
             </Space>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 16 }}>

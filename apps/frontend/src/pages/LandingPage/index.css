@@ -113,10 +113,6 @@
     .ant-row {
         width: 100%;
     }
-
-    .product-card-actions {
-        justify-content: center;
-    }
 }
 
 @media (min-width: 769px) {
