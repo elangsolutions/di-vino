@@ -13,6 +13,12 @@ export class PromotionCartItemInput {
 }
 
 @InputType()
+export class EvaluatePromotionsInput {
+  @Field(() => [PromotionCartItemInput])
+  items: PromotionCartItemInput[];
+}
+
+@InputType()
 export class ValidatePromotionCodeInput {
   @Field()
   code: string;

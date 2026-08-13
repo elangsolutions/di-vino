@@ -15,8 +15,8 @@ import CategoryListPage from "./pages/AdminPage/Categories/CategoryList";
 import CategoryForm from "./pages/AdminPage/Categories/CategoryForm";
 import ItemPriceListPage from "./pages/AdminPage/ItemPrices/ItemPriceList";
 import ItemPriceForm from "./pages/AdminPage/ItemPrices/ItemPriceForm";
-import PromotionCodeListPage from "./pages/AdminPage/PromotionCodes/PromotionCodeList";
-import PromotionCodeForm from "./pages/AdminPage/PromotionCodes/PromotionCodeForm";
+import PromotionListPage from "./pages/AdminPage/Promotions/PromotionList";
+import PromotionForm from "./pages/AdminPage/Promotions/PromotionForm";
 import AdminOrderListPage from "./pages/AdminPage/Orders/OrderList";
 import CartPage from "./pages/CartPage";
 import OrdersPage from "./pages/OrdersPage";
@@ -93,18 +93,20 @@ const App = () => {
                                     }
                                 />
 
-                                <Route path="promotion-codes" element={<PromotionCodeListPage/>}/>
+                                <Route path="promotions" element={<PromotionListPage/>}/>
                                 <Route
-                                    path="/admin/promotion-codes/:id"
+                                    path="/admin/promotions/:id"
                                     element={
                                         <PrivateRoute>
                                             <InstanceFormPage
-                                                entityName="código promocional"
-                                                renderForm={(id) => <PromotionCodeForm promotionCodeId={id}/>}
+                                                entityName="promoción"
+                                                renderForm={(id) => <PromotionForm promotionId={id}/>}
                                             />
                                         </PrivateRoute>
                                     }
                                 />
+                                <Route path="promotion-codes" element={<Navigate to="/admin/promotions" replace/>}/>
+                                <Route path="box-promotions" element={<Navigate to="/admin/promotions" replace/>}/>
                             </Route>
                             <Route path='cart' element={<CartPage />}/>
                             <Route path='orders' element={<OrdersPage />}/>

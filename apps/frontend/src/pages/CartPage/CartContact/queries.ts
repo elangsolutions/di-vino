@@ -16,6 +16,7 @@ export const CREATE_ORDER = gql`
         price
         quantity
       }
+      discountAmount
       delivery {
         type
         locationId

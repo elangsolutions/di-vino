@@ -32,16 +32,22 @@ input AddProductInput {
   image: String
   name: String!
   price: Float
+  unitsPerBulk: Int
 }
 
-input AddPromotionCodeInput {
+input AddPromotionInput {
   _id: String
-  code: String!
+  categoryId: String
+  code: String
+  fixedPrice: Float
   fromDate: DateTime!
-  percentage: Float!
+  name: String!
+  percentage: Float
   productId: String
-  scope: PromotionScope!
+  rewardType: PromotionRewardType!
+  scope: PromotionScope
   toDate: DateTime!
+  type: PromotionType!
 }
 
 type Address {
@@ -92,6 +98,10 @@ enum DeliveryType {
   PICKUP
 }
 
+input EvaluatePromotionsInput {
+  items: [PromotionCartItemInput!]!
+}
+
 type ItemPrice {
   _id: ID!
   createdAt: DateTime!
@@ -113,13 +123,13 @@ type Mutation {
   addCategory(input: AddCategoryInput!): Category!
   addItemPrice(input: AddItemPriceInput!): ItemPrice!
   addProduct(input: AddProductInput!): Product!
-  addPromotionCode(input: AddPromotionCodeInput!): PromotionCode!
+  addPromotion(input: AddPromotionInput!): Promotion!
   createOrder(input: CreateOrderDraftInput!): Order!
   createPaymentPreference(amount: Float!, description: String!, orderId: String!): PaymentPreference!
   deleteCategory(input: RemoveCategoryInput!): Category
   deleteItemPrice(input: RemoveItemPriceInput!): ItemPrice
   deleteProduct(input: RemoveProductInput!): Product!
-  deletePromotionCode(input: RemovePromotionCodeInput!): PromotionCode
+  deletePromotion(input: RemovePromotionInput!): Promotion
   login(input: LoginInput!): String!
   register(input: RegisterInput!): String!
   reportOrderIssue(input: ReportOrderIssueInput!): Order!
@@ -135,6 +145,7 @@ type Order {
   customerName: String
   customerPhone: String
   delivery: Delivery!
+  discountAmount: Float
   external_reference: String!
   issues: [OrderIssue!]!
   items: [OrderItem!]!
@@ -206,6 +217,34 @@ type Product {
   name: String!
   price: Float! @deprecated(reason: "Use ItemPrice instead (supports scheduled/promotional pricing windows by date range).")
   stock: Float!
+  unitsPerBulk: Int
+}
+
+type Promotion {
+  _id: ID!
+  categoryId: String
+  categoryName: String
+  code: String
+  fixedPrice: Float
+  fromDate: DateTime!
+  name: String!
+  percentage: Float
+  productId: String
+  rewardType: PromotionRewardType!
+  scope: PromotionScope
+  toDate: DateTime!
+  type: PromotionType!
+}
+
+type PromotionApplicationResult {
+  boxes: Int
+  discountAmount: Float!
+  matchingQuantity: Int!
+  originalSubtotal: Float!
+  promotion: Promotion!
+  promotionalSubtotal: Float!
+  remainderQuantity: Int
+  unitsPerBulk: Int
 }
 
 input PromotionCartItemInput {
@@ -214,35 +253,46 @@ input PromotionCartItemInput {
   quantity: Int!
 }
 
-type PromotionCode {
-  _id: ID!
-  code: String!
-  fromDate: DateTime!
-  percentage: Float!
-  productId: String
-  scope: PromotionScope!
-  toDate: DateTime!
-}
-
 type PromotionDiscountResult {
   discountAmount: Float!
   finalTotal: Float!
   message: String
   originalTotal: Float!
-  promotionCode: PromotionCode
+  promotion: Promotion
   valid: Boolean!
 }
 
+type PromotionEvaluation {
+  applications: [PromotionApplicationResult!]!
+  discountAmount: Float!
+  finalTotal: Float!
+  originalTotal: Float!
+}
+
+enum PromotionRewardType {
+  FIXED_PRICE
+  PERCENTAGE
+}
+
 enum PromotionScope {
+  CATEGORY
   ORDER
   PRODUCT
 }
 
+enum PromotionType {
+  BULK
+  PRODUCT
+  PROMO_CODE
+}
+
 type Query {
   activeItemPrice(at: DateTime, productId: String!): ItemPrice
+  activePromotions: [Promotion!]!
   availableProducts(at: DateTime): [Product!]!
   categories: [Category!]!
   category(id: String!): Category!
+  evaluatePromotions(input: EvaluatePromotionsInput!): PromotionEvaluation!
   itemPrice(id: String!): ItemPrice
   itemPrices: [ItemPrice!]!
   itemPricesByProduct(productId: String!): [ItemPrice!]!
@@ -251,8 +301,8 @@ type Query {
   paymentConfig: PaymentConfig!
   product(id: String!): Product!
   products: [Product!]!
-  promotionCode(id: String!): PromotionCode
-  promotionCodes: [PromotionCode!]!
+  promotion(id: String!): Promotion
+  promotions: [Promotion!]!
 }
 
 input RegisterInput {
@@ -272,7 +322,7 @@ input RemoveProductInput {
   _id: String
 }
 
-input RemovePromotionCodeInput {
+input RemovePromotionInput {
   _id: String!
 }
 

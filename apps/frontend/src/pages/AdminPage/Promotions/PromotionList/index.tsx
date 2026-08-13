@@ -4,9 +4,14 @@ import { Card, List, Typography, Button, Spin, Space, Modal, Grid, Tag } from "a
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import { Link } from "react-router-dom";
 import dayjs from "dayjs";
-import { GET_PROMOTION_CODES, DELETE_PROMOTION_CODE } from "../../../../components/PromotionCode/queries";
+import { GET_PROMOTIONS, DELETE_PROMOTION } from "../../../../components/Promotion/queries";
 import { GET_PRODUCTS } from "../../../../components/Product/queries";
-import { PromotionCode } from "../types";
+import { GET_CATEGORIES } from "../../../../components/Category/queries";
+import {
+    Promotion,
+    describeReward,
+    promotionTypeLabel,
+} from "../../../../components/Promotion/utils";
 import { useNotify } from "../../../../context/NotificationContext";
 
 const getApolloErrorMessage = (err: unknown, fallback: string) => {
@@ -19,36 +24,54 @@ const getApolloErrorMessage = (err: unknown, fallback: string) => {
     return fallback;
 };
 
-const PromotionCodeListPage = () => {
+const PromotionListPage = () => {
     const { notifySuccess, notifyError } = useNotify();
-    const [promotionToDelete, setPromotionToDelete] = useState<PromotionCode | null>(null);
-    const { data, loading, error, refetch } = useQuery(GET_PROMOTION_CODES);
+    const [promotionToDelete, setPromotionToDelete] = useState<Promotion | null>(null);
+    const { data, loading, error, refetch } = useQuery(GET_PROMOTIONS);
     const { data: productsData } = useQuery(GET_PRODUCTS);
-    const [deletePromotionCode, { loading: deleting }] = useMutation(DELETE_PROMOTION_CODE, {
-        refetchQueries: [{ query: GET_PROMOTION_CODES }],
+    const { data: categoriesData } = useQuery(GET_CATEGORIES);
+    const [deletePromotion, { loading: deleting }] = useMutation(DELETE_PROMOTION, {
+        refetchQueries: [{ query: GET_PROMOTIONS }],
         awaitRefetchQueries: true,
     });
     const { useBreakpoint } = Grid;
-
     const screens = useBreakpoint();
     const isMobile = !screens.md;
 
     const products: { _id: string; name: string }[] = productsData?.products || [];
+    const categories: { _id: string; name: string }[] = categoriesData?.categories || [];
 
-    const getProductName = (productId?: string) => {
+    const getProductName = (productId?: string | null) => {
         if (!productId) return null;
-        return products.find((p) => p._id === productId)?.name ?? productId;
+        return products.find((product) => product._id === productId)?.name ?? productId;
     };
 
-    const isActive = (promotion: PromotionCode) => {
+    const getCategoryName = (promotion: Promotion) => {
+        if (promotion.categoryName) return promotion.categoryName;
+        if (!promotion.categoryId) return null;
+        return categories.find((category) => category._id === promotion.categoryId)?.name
+            ?? promotion.categoryId;
+    };
+
+    const scopeLabel = (promotion: Promotion) => {
+        if (promotion.type === "PRODUCT" || promotion.scope === "PRODUCT") {
+            return `Producto: ${getProductName(promotion.productId) ?? "—"}`;
+        }
+        if (promotion.scope === "CATEGORY") {
+            return `Categoría: ${getCategoryName(promotion) ?? "—"}`;
+        }
+        return "Pedido completo";
+    };
+
+    const isActive = (promotion: Promotion) => {
         const now = dayjs();
         return now.isAfter(dayjs(promotion.fromDate)) && now.isBefore(dayjs(promotion.toDate));
     };
 
     if (loading) return <Spin style={{ display: "block", margin: "2rem auto" }} />;
-    if (error) return <p>Error al cargar códigos promocionales: {error.message}</p>;
+    if (error) return <p>Error al cargar promociones: {error.message}</p>;
 
-    const promotionCodes: PromotionCode[] = data?.promotionCodes || [];
+    const promotions: Promotion[] = data?.promotions || [];
 
     const closeDeleteModal = () => {
         if (!deleting) {
@@ -60,23 +83,23 @@ const PromotionCodeListPage = () => {
         if (!promotionToDelete) return;
 
         try {
-            const result = await deletePromotionCode({
+            const result = await deletePromotion({
                 variables: { input: { _id: promotionToDelete._id } },
             });
 
-            if (!result.data?.deletePromotionCode) {
-                throw new Error("No se pudo eliminar el código promocional.");
+            if (!result.data?.deletePromotion) {
+                throw new Error("No se pudo eliminar la promoción.");
             }
 
             notifySuccess(
-                "Código eliminado",
-                `"${promotionToDelete.code}" se eliminó correctamente.`,
+                "Promoción eliminada",
+                `"${promotionToDelete.name}" se eliminó correctamente.`,
             );
             setPromotionToDelete(null);
             await refetch();
         } catch (err) {
             notifyError(
-                "No se pudo eliminar el código",
+                "No se pudo eliminar la promoción",
                 getApolloErrorMessage(err, "Error desconocido"),
             );
         }
@@ -84,27 +107,32 @@ const PromotionCodeListPage = () => {
 
     return (
         <div style={{ padding: isMobile ? 2 : 24 }}>
-            <Typography.Title level={2}>Códigos promocionales</Typography.Title>
+            <Typography.Title level={2}>Promociones</Typography.Title>
+            <Typography.Paragraph type="secondary">
+                Volumen (caja), descuento por producto o código promocional. Cada una puede ser
+                porcentaje o precio fijo, con vigencia.
+            </Typography.Paragraph>
 
             <List
                 grid={{ gutter: 16, column: isMobile ? 1 : 2 }}
-                dataSource={promotionCodes}
+                dataSource={promotions}
                 renderItem={(promotion) => (
                     <List.Item>
                         <Card
                             title={
-                                <Space>
-                                    <span>{promotion.code}</span>
+                                <Space wrap>
+                                    <span>{promotion.name}</span>
+                                    <Tag>{promotionTypeLabel[promotion.type]}</Tag>
                                     {isActive(promotion) ? (
                                         <Tag color="green">Activo</Tag>
                                     ) : (
-                                        <Tag color="default">Inactivo</Tag>
+                                        <Tag>Inactivo</Tag>
                                     )}
                                 </Space>
                             }
                             extra={
                                 <Space>
-                                    <Link to={`/admin/promotion-codes/${promotion._id}`}>Editar</Link>
+                                    <Link to={`/admin/promotions/${promotion._id}`}>Editar</Link>
                                     <Button
                                         type="link"
                                         danger
@@ -120,13 +148,11 @@ const PromotionCodeListPage = () => {
                                 </Space>
                             }
                         >
-                            <p><strong>Descuento:</strong> {promotion.percentage}%</p>
-                            <p>
-                                <strong>Alcance:</strong>{" "}
-                                {promotion.scope === "ORDER"
-                                    ? "Pedido completo"
-                                    : `Producto: ${getProductName(promotion.productId) ?? "—"}`}
-                            </p>
+                            {promotion.code && (
+                                <p><strong>Código:</strong> {promotion.code}</p>
+                            )}
+                            <p><strong>Beneficio:</strong> {describeReward(promotion)}</p>
+                            <p><strong>Alcance:</strong> {scopeLabel(promotion)}</p>
                             <p>
                                 <strong>Vigencia:</strong>{" "}
                                 {dayjs(promotion.fromDate).format("DD/MM/YYYY")} –{" "}
@@ -138,7 +164,7 @@ const PromotionCodeListPage = () => {
             />
 
             <Button type="primary" style={{ marginTop: 16 }}>
-                <Link to="/admin/promotion-codes/new">Agregar código</Link>
+                <Link to="/admin/promotions/new">Agregar promoción</Link>
             </Button>
 
             <Modal
@@ -158,12 +184,12 @@ const PromotionCodeListPage = () => {
                 destroyOnClose
             >
                 <p>
-                    ¿Estás seguro de que querés eliminar el código{" "}
-                    <strong>{promotionToDelete?.code}</strong>?
+                    ¿Estás seguro de que querés eliminar la promoción{" "}
+                    <strong>{promotionToDelete?.name}</strong>?
                 </p>
             </Modal>
         </div>
     );
 };
 
-export default PromotionCodeListPage;
+export default PromotionListPage;

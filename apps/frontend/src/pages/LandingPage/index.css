@@ -113,16 +113,6 @@
     .ant-row {
         width: 100%;
     }
-
-    .product-card-actions {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .product-card-actions .ant-space {
-        justify-content: center;
-    }
 }
 
 @media (min-width: 769px) {

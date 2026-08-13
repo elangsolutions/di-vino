@@ -19,13 +19,17 @@ const slice = createSlice({
                 : 1;
             state.quantities[id] = (state.quantities[id] || 0) + amount;
         },
-        decrement: (state, action: PayloadAction<{ productId: string }>) => {
+        decrement: (state, action: PayloadAction<{ productId: string; amount?: number }>) => {
             const id = action.payload.productId;
             const current = state.quantities[id] || 0;
-            if (current <= 1) {
+            const amount = action.payload.amount && action.payload.amount > 0
+                ? Math.floor(action.payload.amount)
+                : 1;
+            const next = current - amount;
+            if (next <= 0) {
                 delete state.quantities[id];
             } else {
-                state.quantities[id] = current - 1;
+                state.quantities[id] = next;
             }
         },
         remove: (state, action: PayloadAction<{ productId: string }>) => {

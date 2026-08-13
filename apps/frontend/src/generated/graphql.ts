@@ -25,6 +25,18 @@ export type AddAddressInput = {
   street: Scalars['String']['input'];
 };
 
+export type AddBoxPromotionInput = {
+  _id?: InputMaybe<Scalars['String']['input']>;
+  boxPrice: Scalars['Float']['input'];
+  boxQuantity: Scalars['Int']['input'];
+  categoryId?: InputMaybe<Scalars['String']['input']>;
+  fromDate: Scalars['DateTime']['input'];
+  name: Scalars['String']['input'];
+  productId?: InputMaybe<Scalars['String']['input']>;
+  scope: BoxPromotionScope;
+  toDate: Scalars['DateTime']['input'];
+};
+
 export type AddCategoryInput = {
   _id?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -48,6 +60,7 @@ export type AddProductInput = {
   image?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
   price?: InputMaybe<Scalars['Float']['input']>;
+  unitsPerBulk?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type AddPromotionCodeInput = {
@@ -67,6 +80,50 @@ export type Address = {
   province: Scalars['String']['output'];
   street: Scalars['String']['output'];
 };
+
+export type BoxPromotion = {
+  __typename?: 'BoxPromotion';
+  _id: Scalars['ID']['output'];
+  boxPrice: Scalars['Float']['output'];
+  boxQuantity: Scalars['Int']['output'];
+  categoryId?: Maybe<Scalars['String']['output']>;
+  categoryName?: Maybe<Scalars['String']['output']>;
+  fromDate: Scalars['DateTime']['output'];
+  name: Scalars['String']['output'];
+  productId?: Maybe<Scalars['String']['output']>;
+  scope: BoxPromotionScope;
+  toDate: Scalars['DateTime']['output'];
+};
+
+export type BoxPromotionApplication = {
+  __typename?: 'BoxPromotionApplication';
+  boxes: Scalars['Int']['output'];
+  discountAmount: Scalars['Float']['output'];
+  matchingQuantity: Scalars['Int']['output'];
+  originalSubtotal: Scalars['Float']['output'];
+  promotion: BoxPromotion;
+  promotionalSubtotal: Scalars['Float']['output'];
+  remainderQuantity: Scalars['Int']['output'];
+};
+
+export type BoxPromotionCartItemInput = {
+  price: Scalars['Float']['input'];
+  productId: Scalars['String']['input'];
+  quantity: Scalars['Int']['input'];
+};
+
+export type BoxPromotionEvaluation = {
+  __typename?: 'BoxPromotionEvaluation';
+  applications: Array<BoxPromotionApplication>;
+  discountAmount: Scalars['Float']['output'];
+  finalTotal: Scalars['Float']['output'];
+  originalTotal: Scalars['Float']['output'];
+};
+
+export enum BoxPromotionScope {
+  Category = 'CATEGORY',
+  Product = 'PRODUCT'
+}
 
 export type Category = {
   __typename?: 'Category';
@@ -106,6 +163,10 @@ export enum DeliveryType {
   Pickup = 'PICKUP'
 }
 
+export type EvaluateBoxPromotionsInput = {
+  items: Array<BoxPromotionCartItemInput>;
+};
+
 export type ItemPrice = {
   __typename?: 'ItemPrice';
   _id: Scalars['ID']['output'];
@@ -129,18 +190,23 @@ export type Mutation = {
   addCategory: Category;
   addItemPrice: ItemPrice;
   addProduct: Product;
-  addPromotionCode: PromotionCode;
+  addPromotion: Promotion;
   createOrder: Order;
   createPaymentPreference: PaymentPreference;
   deleteCategory?: Maybe<Category>;
   deleteItemPrice?: Maybe<ItemPrice>;
   deleteProduct: Product;
-  deletePromotionCode?: Maybe<PromotionCode>;
+  deletePromotion?: Maybe<Promotion>;
   login: Scalars['String']['output'];
   register: Scalars['String']['output'];
   reportOrderIssue: Order;
   updateOrderStatus: Order;
   validatePromotionCode: PromotionDiscountResult;
+};
+
+
+export type MutationAddPromotionArgs = {
+  input: AddPromotionInput;
 };
 
 
@@ -173,6 +239,11 @@ export type MutationCreatePaymentPreferenceArgs = {
   amount: Scalars['Float']['input'];
   description: Scalars['String']['input'];
   orderId: Scalars['String']['input'];
+};
+
+
+export type MutationDeleteBoxPromotionArgs = {
+  input: RemoveBoxPromotionInput;
 };
 
 
@@ -229,6 +300,7 @@ export type Order = {
   customerName?: Maybe<Scalars['String']['output']>;
   customerPhone?: Maybe<Scalars['String']['output']>;
   delivery: Delivery;
+  discountAmount?: Maybe<Scalars['Float']['output']>;
   external_reference: Scalars['String']['output'];
   issues: Array<OrderIssue>;
   items: Array<OrderItem>;
@@ -306,6 +378,7 @@ export type Product = {
   /** @deprecated Use ItemPrice instead (supports scheduled/promotional pricing windows by date range). */
   price: Scalars['Float']['output'];
   stock: Scalars['Float']['output'];
+  unitsPerBulk?: Maybe<Scalars['Int']['output']>;
 };
 
 export type PromotionCartItemInput = {
@@ -331,21 +404,95 @@ export type PromotionDiscountResult = {
   finalTotal: Scalars['Float']['output'];
   message?: Maybe<Scalars['String']['output']>;
   originalTotal: Scalars['Float']['output'];
-  promotionCode?: Maybe<PromotionCode>;
+  promotion?: Maybe<Promotion>;
   valid: Scalars['Boolean']['output'];
 };
 
+export enum PromotionRewardType {
+  FixedPrice = 'FIXED_PRICE',
+  Percentage = 'PERCENTAGE'
+}
+
 export enum PromotionScope {
+  Category = 'CATEGORY',
   Order = 'ORDER',
   Product = 'PRODUCT'
 }
 
+export enum PromotionType {
+  Bulk = 'BULK',
+  Product = 'PRODUCT',
+  PromoCode = 'PROMO_CODE'
+}
+
+export type Promotion = {
+  __typename?: 'Promotion';
+  _id: Scalars['ID']['output'];
+  categoryId?: Maybe<Scalars['String']['output']>;
+  categoryName?: Maybe<Scalars['String']['output']>;
+  code?: Maybe<Scalars['String']['output']>;
+  fixedPrice?: Maybe<Scalars['Float']['output']>;
+  fromDate: Scalars['DateTime']['output'];
+  name: Scalars['String']['output'];
+  percentage?: Maybe<Scalars['Float']['output']>;
+  productId?: Maybe<Scalars['String']['output']>;
+  rewardType: PromotionRewardType;
+  scope?: Maybe<PromotionScope>;
+  toDate: Scalars['DateTime']['output'];
+  type: PromotionType;
+};
+
+export type AddPromotionInput = {
+  _id?: InputMaybe<Scalars['String']['input']>;
+  categoryId?: InputMaybe<Scalars['String']['input']>;
+  code?: InputMaybe<Scalars['String']['input']>;
+  fixedPrice?: InputMaybe<Scalars['Float']['input']>;
+  fromDate: Scalars['DateTime']['input'];
+  name: Scalars['String']['input'];
+  percentage?: InputMaybe<Scalars['Float']['input']>;
+  productId?: InputMaybe<Scalars['String']['input']>;
+  rewardType: PromotionRewardType;
+  scope?: InputMaybe<PromotionScope>;
+  toDate: Scalars['DateTime']['input'];
+  type: PromotionType;
+};
+
+export type PromotionApplicationResult = {
+  __typename?: 'PromotionApplicationResult';
+  boxes?: Maybe<Scalars['Int']['output']>;
+  discountAmount: Scalars['Float']['output'];
+  matchingQuantity: Scalars['Int']['output'];
+  originalSubtotal: Scalars['Float']['output'];
+  promotion: Promotion;
+  promotionalSubtotal: Scalars['Float']['output'];
+  remainderQuantity?: Maybe<Scalars['Int']['output']>;
+  unitsPerBulk?: Maybe<Scalars['Int']['output']>;
+};
+
+export type PromotionEvaluation = {
+  __typename?: 'PromotionEvaluation';
+  applications: Array<PromotionApplicationResult>;
+  discountAmount: Scalars['Float']['output'];
+  finalTotal: Scalars['Float']['output'];
+  originalTotal: Scalars['Float']['output'];
+};
+
+export type EvaluatePromotionsInput = {
+  items: Array<PromotionCartItemInput>;
+};
+
+export type RemovePromotionInput = {
+  _id: Scalars['String']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   activeItemPrice?: Maybe<ItemPrice>;
+  activePromotions: Array<Promotion>;
   availableProducts: Array<Product>;
   categories: Array<Category>;
   category: Category;
+  evaluatePromotions: PromotionEvaluation;
   itemPrice?: Maybe<ItemPrice>;
   itemPrices: Array<ItemPrice>;
   itemPricesByProduct: Array<ItemPrice>;
@@ -354,8 +501,8 @@ export type Query = {
   paymentConfig: PaymentConfig;
   product: Product;
   products: Array<Product>;
-  promotionCode?: Maybe<PromotionCode>;
-  promotionCodes: Array<PromotionCode>;
+  promotion?: Maybe<Promotion>;
+  promotions: Array<Promotion>;
 };
 
 
@@ -370,8 +517,28 @@ export type QueryAvailableProductsArgs = {
 };
 
 
+export type QueryBoxPromotionArgs = {
+  id: Scalars['String']['input'];
+};
+
+
+export type QueryEvaluatePromotionsArgs = {
+  input: EvaluatePromotionsInput;
+};
+
+
+export type QueryPromotionArgs = {
+  id: Scalars['String']['input'];
+};
+
+
 export type QueryCategoryArgs = {
   id: Scalars['String']['input'];
+};
+
+
+export type QueryEvaluateBoxPromotionsArgs = {
+  input: EvaluateBoxPromotionsInput;
 };
 
 
@@ -402,6 +569,10 @@ export type QueryPromotionCodeArgs = {
 export type RegisterInput = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
+};
+
+export type RemoveBoxPromotionInput = {
+  _id: Scalars['String']['input'];
 };
 
 export type RemoveCategoryInput = {
@@ -712,6 +883,7 @@ export type ProductResolvers<ContextType = any, ParentType extends ResolversPare
   name?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   price?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
   stock?: Resolver<ResolversTypes['Float'], ParentType, ContextType>;
+  unitsPerBulk?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

@@ -11,6 +11,13 @@ import {cacheProducts} from "../../store/product/slice.ts";
 import {getCartUnitsCount} from "../../store/cart/slice.ts";
 import {selectOngoingOrders} from "../../store/orders/slice.ts";
 import OngoingOrdersBanner from "../../components/OngoingOrdersBanner";
+import {useQuery} from '@apollo/client';
+import {GET_ACTIVE_PROMOTIONS} from "../../components/Promotion/queries";
+import {
+    matchingBulkPromotion,
+    matchingProductPromotion,
+    Promotion,
+} from "../../components/Promotion/utils";
 
 const {Title, Text} = Typography;
 const {Content, Footer} = Layout;
@@ -26,6 +33,8 @@ const currencyFormatter = (val?: number) => {
 
 const LandingPage: FC = () => {
     const {products, loading, error} = useGetAvailableProducts();
+    const {data: promotionsData} = useQuery(GET_ACTIVE_PROMOTIONS);
+    const promotions: Promotion[] = promotionsData?.activePromotions || [];
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const totalItems = useSelector(getCartUnitsCount);
@@ -245,7 +254,12 @@ const LandingPage: FC = () => {
                     {filteredProducts.length > 0 ? (
                         <Row gutter={[16, 16]}>
                             {filteredProducts.map((product: Product) => (
-                                <ProductCard key={product._id} product={product}/>
+                                <ProductCard
+                                    key={product._id}
+                                    product={product}
+                                    bulkPromotion={matchingBulkPromotion(promotions, product)}
+                                    productPromotion={matchingProductPromotion(promotions, product)}
+                                />
                             ))}
                         </Row>
                     ) : (

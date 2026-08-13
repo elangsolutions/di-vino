@@ -110,6 +110,7 @@ const CartContact = ({ onCompleted }: CartContactProps) => {
                         locationId: order.delivery?.locationId ?? delivery.pickup.locationId,
                         items: order.items ?? items,
                         createdAt: order.createdAt ?? new Date().toISOString(),
+                        discountAmount: order.discountAmount ?? 0,
                     }),
                 );
             }

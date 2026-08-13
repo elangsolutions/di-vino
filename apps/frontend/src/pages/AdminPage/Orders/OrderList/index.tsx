@@ -357,6 +357,11 @@ const OrderListPage = () => {
                                                     {formatCurrency(item.price * item.quantity)}
                                                 </Text>
                                             ))}
+                                            {Boolean(order.discountAmount) && (
+                                                <Text type="success">
+                                                    Promociones — -{formatCurrency(order.discountAmount || 0)}
+                                                </Text>
+                                            )}
                                         </Space>
                                     </Descriptions.Item>
                                     <Descriptions.Item label="Contacto">

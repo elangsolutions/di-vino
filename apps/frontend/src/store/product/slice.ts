@@ -7,6 +7,7 @@ export type Product = {
     details?: string;
     image?: string;
     category?: string;
+    unitsPerBulk?: number;
 };
 
 
